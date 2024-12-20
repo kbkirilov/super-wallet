@@ -57,7 +57,8 @@ create table wallets
 
 create table admins
 (
-    user_id int auto_increment primary key ,
+    admin_id int auto_increment primary key ,
+    user_id int ,
 
     constraint fk_admins_user_id
         foreign key (user_id) references users (user_id)
