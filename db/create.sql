@@ -21,7 +21,10 @@ create table users
     last_name varchar(20) not null ,
     date_of_birth datetime not null ,
     address varchar(200) not null ,
-    role_id int default 1
+    role_id int default 1,
+
+    constraint fk_users_role_id
+        foreign key (role_id) references roles (role_id)
 );
 
 create table pocket_money
