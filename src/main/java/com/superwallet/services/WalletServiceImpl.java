@@ -9,7 +9,7 @@ import com.superwallet.services.interfaces.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.superwallet.helpers.Constants.CAN_T_SEE_OTHER_USERS_WALLETS_ERROR_MESSAGE;
+import static com.superwallet.helpers.Constants.*;
 
 @Service
 public class WalletServiceImpl implements WalletService {
@@ -23,18 +23,11 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public Wallet getWalletById(User userAuthenticated, int walletId) {
-        if (!checkIfOwnerOfWallet(userAuthenticated, walletId)) {
-            throw new AuthorizationException(CAN_T_SEE_OTHER_USERS_WALLETS_ERROR_MESSAGE);
-        }
+        checkViewPermissions(userAuthenticated, walletId);
 
         return walletJpaRepository
                 .getWalletByWalletId(walletId)
                 .orElseThrow(() -> new EntityNotFoundException("Wallet", walletId));
-    }
-
-    @Override
-    public double getWalletBalance(User userAuthenticated, int walletId) {
-        return 0;
     }
 
     private boolean checkIfOwnerOfWallet(User userAuthenticated, int walletId) {
@@ -43,5 +36,9 @@ public class WalletServiceImpl implements WalletService {
                 .anyMatch(wallet -> wallet.getWalletId() == walletId);
     }
 
-
+    private void checkViewPermissions (User userAuthenticated, int walletId) {
+        if (!(userAuthenticated.getRoleId().getName().equalsIgnoreCase(ADMIN_ROLE) || checkIfOwnerOfWallet(userAuthenticated, walletId))){
+            throw new AuthorizationException(CAN_T_SEE_OTHER_USERS_WALLETS_ERROR_MESSAGE);
+        }
+    }
 }
