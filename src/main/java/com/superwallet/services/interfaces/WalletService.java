@@ -8,6 +8,4 @@ import org.springframework.stereotype.Service;
 public interface WalletService {
 
     Wallet getWalletById(User userAuthenticated, int walletId);
-
-    double getWalletBalance(User userAuthenticated, int walletId);
 }
