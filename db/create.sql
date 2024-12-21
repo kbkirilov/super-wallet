@@ -49,7 +49,7 @@ create table statuses
 create table wallets
 (
     wallet_id int auto_increment primary key ,
-    name varchar(40) ,
+    name varchar(40) not null ,
     currency_id int ,
     user_id int ,
     status_id int default 1,
@@ -61,5 +61,7 @@ create table wallets
     constraint fk_wallets_user_id
         foreign key (user_id) references users (user_id) ,
     constraint fk_wallets_status_id
-        foreign key (status_id) references statuses (status_id)
+        foreign key (status_id) references statuses (status_id) ,
+    constraint unique_user_wallet_name
+        unique (user_id, name)
 );
