@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -34,11 +35,15 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "is_admin")
-    private boolean isAdmin;
+    @OneToOne
+    @JoinColumn(name = "role_id")
+    private Role roleId;
 
-    @OneToMany(mappedBy = "user")
-    private Set<PocketMoney> pocketMoneySet;
+    @OneToMany(mappedBy = "userId")
+    private Set<PocketMoney> pocketMoney;
+
+    @OneToMany(mappedBy = "userId")
+    private Set<Wallet> wallets;
 
     public User() {
     }
@@ -99,11 +104,40 @@ public class User {
         this.address = address;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    public Role getRoleId() {
+        return roleId;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
+    public void setRoleId(Role roleId) {
+        this.roleId = roleId;
+    }
+
+    public Set<PocketMoney> getPocketMoney() {
+        return pocketMoney;
+    }
+
+    public void setPocketMoney(Set<PocketMoney> pocketMoney) {
+        this.pocketMoney = pocketMoney;
+    }
+
+    public Set<Wallet> getWallets() {
+        return wallets;
+    }
+
+    public void setWallets(Set<Wallet> wallets) {
+        this.wallets = wallets;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return userId == user.userId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(userId);
     }
 }

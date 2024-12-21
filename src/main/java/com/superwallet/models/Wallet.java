@@ -2,6 +2,8 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "wallets")
 public class Wallet {
@@ -9,7 +11,7 @@ public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "wallet_id")
-    private int id;
+    private int walletId;
 
     @Column(name = "name")
     private String name;
@@ -18,9 +20,9 @@ public class Wallet {
     @JoinColumn(name = "currency_id")
     private Currency currencyId;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User userId;
 
     @OneToOne
     @JoinColumn(name = "status_id")
@@ -32,12 +34,12 @@ public class Wallet {
     public Wallet() {
     }
 
-    public int getId() {
-        return id;
+    public int getWalletId() {
+        return walletId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setWalletId(int walletId) {
+        this.walletId = walletId;
     }
 
     public String getName() {
@@ -56,12 +58,12 @@ public class Wallet {
         this.currencyId = currencyId;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     public Status getStatus() {
@@ -78,5 +80,18 @@ public class Wallet {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Wallet wallet = (Wallet) object;
+        return walletId == wallet.walletId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(walletId);
     }
 }

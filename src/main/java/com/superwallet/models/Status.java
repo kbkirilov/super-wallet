@@ -2,6 +2,8 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "statuses")
 public class Status {
@@ -31,5 +33,18 @@ public class Status {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Status status = (Status) object;
+        return statusId == status.statusId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(statusId);
     }
 }

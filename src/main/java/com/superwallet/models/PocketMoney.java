@@ -2,6 +2,8 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "pocket_money")
 public class PocketMoney {
@@ -55,5 +57,18 @@ public class PocketMoney {
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        PocketMoney that = (PocketMoney) object;
+        return pocketMoneyId == that.pocketMoneyId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(pocketMoneyId);
     }
 }

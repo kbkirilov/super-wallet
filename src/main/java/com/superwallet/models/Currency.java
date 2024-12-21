@@ -2,6 +2,8 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "currencies")
 public class Currency {
@@ -53,5 +55,18 @@ public class Currency {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Currency currency = (Currency) object;
+        return currencyId == currency.currencyId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(currencyId);
     }
 }
