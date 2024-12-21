@@ -6,6 +6,12 @@ create table currencies
     country varchar(30) not null
 );
 
+create table roles
+(
+    role_id int auto_increment primary key ,
+    name varchar(20) not null unique
+);
+
 create table users
 (
     user_id int auto_increment primary key ,
@@ -15,7 +21,7 @@ create table users
     last_name varchar(20) not null ,
     date_of_birth datetime not null ,
     address varchar(200) not null ,
-    is_admin boolean
+    role_id int default 1
 );
 
 create table pocket_money
@@ -53,13 +59,4 @@ create table wallets
         foreign key (user_id) references users (user_id) ,
     constraint fk_wallets_status_id
         foreign key (status_id) references statuses (status_id)
-);
-
-create table admins
-(
-    admin_id int auto_increment primary key ,
-    user_id int ,
-
-    constraint fk_admins_user_id
-        foreign key (user_id) references users (user_id)
 );
