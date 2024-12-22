@@ -6,12 +6,6 @@ create table currencies
     country varchar(30) not null
 );
 
-create table roles
-(
-    role_id int auto_increment primary key ,
-    name varchar(20) not null unique
-);
-
 create table users
 (
     user_id int auto_increment primary key ,
@@ -20,11 +14,7 @@ create table users
     first_name varchar(20) not null ,
     last_name varchar(20) not null ,
     date_of_birth datetime not null ,
-    address varchar(200) not null ,
-    role_id int default 1,
-
-    constraint fk_users_role_id
-        foreign key (role_id) references roles (role_id)
+    address varchar(200) not null
 );
 
 create table pocket_money
@@ -53,7 +43,7 @@ create table wallets
     currency_id int ,
     user_id int ,
     status_id int default 1,
-    balance decimal(15,2) default 0 ,
+    balance decimal(15,2) not null default 0 ,
     created_at datetime default current_timestamp ,
 
     constraint fk_wallets_currency_id

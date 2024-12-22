@@ -2,6 +2,7 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -14,7 +15,7 @@ public class PocketMoney {
     private int pocketMoneyId;
 
     @Column(name = "amount")
-    private double amount;
+    private BigDecimal amount;
 
     @OneToOne
     @JoinColumn(name = "currency_id")
@@ -35,11 +36,11 @@ public class PocketMoney {
         this.pocketMoneyId = pocketMoneyId;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

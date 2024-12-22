@@ -6,10 +6,10 @@ import com.superwallet.models.dto.WalletDtoInCreate;
 import com.superwallet.models.dto.WalletDtoOut;
 import com.superwallet.services.interfaces.CurrencyService;
 import com.superwallet.services.interfaces.StatusService;
-import com.superwallet.services.interfaces.UserService;
-import com.superwallet.services.interfaces.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 public class ModelMapper {
@@ -42,6 +42,7 @@ public class ModelMapper {
         wallet.setCurrency(currencyService.getCurrencyByCurrencyCode(walletDtoInCreate.getCurrencyCode()));
         wallet.setUser(userAuthenticated);
         wallet.setStatus(statusService.getStatusById(1));
+        wallet.setBalance(BigDecimal.ZERO);
 
         return wallet;
     }

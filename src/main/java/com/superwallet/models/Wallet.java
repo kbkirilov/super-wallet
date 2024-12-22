@@ -2,6 +2,7 @@ package com.superwallet.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -29,7 +30,7 @@ public class Wallet {
     private Status status;
 
     @Column(name = "balance")
-    private double balance;
+    private BigDecimal balance;
 
     public Wallet() {
     }
@@ -74,11 +75,11 @@ public class Wallet {
         this.status = status;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
