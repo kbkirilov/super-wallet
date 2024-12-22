@@ -1,10 +1,12 @@
 package com.superwallet.models.dto;
 
+import java.math.BigDecimal;
+
 public class WalletDtoOut {
 
     private String username;
     private String name;
-    private double balance;
+    private BigDecimal balance;
     private String currency;
     private String status;
 
@@ -19,11 +21,11 @@ public class WalletDtoOut {
         this.name = name;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
