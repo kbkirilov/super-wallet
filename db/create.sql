@@ -30,7 +30,7 @@ create table users
 create table pocket_money
 (
     pocket_money_id int auto_increment primary key ,
-    amount double not null ,
+    amount decimal(15,2) not null ,
     currency_id int ,
     user_id int ,
 
@@ -53,7 +53,7 @@ create table wallets
     currency_id int ,
     user_id int ,
     status_id int default 1,
-    balance double default 0 ,
+    balance decimal(15,2) default 0 ,
     created_at datetime default current_timestamp ,
 
     constraint fk_wallets_currency_id
