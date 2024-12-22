@@ -4,7 +4,8 @@ values
     (2, 'USD', 'United States Dollar', 'United States'),
     (3, 'EUR', 'Euro', 'European Union'),
     (4, 'GBP', 'British Pound Sterling', 'United Kingdom'),
-    (5, 'JPY', 'Japanese Yen', 'Japan');
+    (5, 'JPY', 'Japanese Yen', 'Japan'),
+    (6, 'CHF', 'Swiss Franc', 'Switzerland');
 
 insert into roles (role_id, name)
 values
