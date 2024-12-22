@@ -8,7 +8,7 @@ import com.superwallet.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.superwallet.helpers.Constants.PROFILES_OF_OTHER_USERS_ERROR_MESSAGE;
+import static com.superwallet.helpers.Constants.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,6 +18,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserJpaRepository userJpaRepository) {
         this.userJpaRepository = userJpaRepository;
+    }
+
+    @Override
+    public void checkIfUserIsOwnerOfWallet(User userAuthenticated, int walletId) {
+        boolean isOwner = userAuthenticated.getWallets()
+                .stream()
+                .anyMatch(wallet -> wallet.getWalletId() == walletId);
+
+        if (!isOwner) {
+            throw new AuthorizationException(CANT_MAKE_CHANGES_IF_NOT_OWNER);
+        }
     }
 
     @Override
