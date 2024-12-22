@@ -47,22 +47,20 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dtoInUpdate) {
+
         int currStatusId = walletToUpdate.getStatus().getStatusId();
+        Integer newStatusId = dtoInUpdate.getStatusId() != null ? Integer.parseInt(dtoInUpdate.getStatusId()) : null;
 
-        if (currStatusId == 2 && dtoInUpdate.getStatusId() == null) {
+        if (currStatusId == 2 && newStatusId == null) {
             throw new IllegalStateException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
-        } else if (dtoInUpdate.getStatusId() != null) {
-            int parsedStatus = Integer.parseInt(dtoInUpdate.getStatusId());
+        }
 
-            if (currStatusId != 1 && parsedStatus == 2) {
+        if (newStatusId != null) {
+            if (currStatusId != 1 && newStatusId == 2) {
                 throw new IllegalStateException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
             }
 
-            if (parsedStatus == 1) {
-                walletToUpdate.setStatus(statusService.getStatusById(parsedStatus));
-            } else if (parsedStatus == 2) {
-                walletToUpdate.setStatus(statusService.getStatusById(parsedStatus));
-            }
+            walletToUpdate.setStatus(statusService.getStatusById(newStatusId));
         }
 
         if (dtoInUpdate.getName() != null) {
