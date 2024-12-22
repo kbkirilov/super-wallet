@@ -22,6 +22,11 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
+    public void createWallet(Wallet wallet) {
+        walletJpaRepository.save(wallet);
+    }
+
+    @Override
     public Wallet getWalletById(User userAuthenticated, int walletId) {
         checkViewPermissions(userAuthenticated, walletId);
 
@@ -37,7 +42,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     private void checkViewPermissions (User userAuthenticated, int walletId) {
-        if (!(userAuthenticated.getRoleId().getName().equalsIgnoreCase(ADMIN_ROLE) || checkIfOwnerOfWallet(userAuthenticated, walletId))){
+        if (!(userAuthenticated.getRole().getName().equalsIgnoreCase(ADMIN_ROLE) || checkIfOwnerOfWallet(userAuthenticated, walletId))){
             throw new AuthorizationException(CAN_T_SEE_OTHER_USERS_WALLETS_ERROR_MESSAGE);
         }
     }

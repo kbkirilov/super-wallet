@@ -1,7 +1,12 @@
 package com.superwallet.helpers;
 
+import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
+import com.superwallet.models.dto.WalletDtoInCreate;
 import com.superwallet.models.dto.WalletDtoOut;
+import com.superwallet.services.interfaces.CurrencyService;
+import com.superwallet.services.interfaces.StatusService;
+import com.superwallet.services.interfaces.UserService;
 import com.superwallet.services.interfaces.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,22 +14,35 @@ import org.springframework.stereotype.Component;
 @Component
 public class ModelMapper {
 
-    private final WalletService walletService;
+    private final CurrencyService currencyService;
+    private final StatusService statusService;
 
     @Autowired
-    public ModelMapper(WalletService walletService) {
-        this.walletService = walletService;
+    public ModelMapper(CurrencyService currencyService, StatusService statusService) {
+        this.currencyService = currencyService;
+        this.statusService = statusService;
     }
 
     public WalletDtoOut fromWalletTOWalletDtoOut (Wallet wallet) {
         WalletDtoOut dto = new WalletDtoOut();
 
-        dto.setUsername(wallet.getUserId().getUsername());
+        dto.setUsername(wallet.getUser().getUsername());
         dto.setName(wallet.getName());
         dto.setBalance(wallet.getBalance());
-        dto.setCurrency(wallet.getCurrencyId().getCurrencyCode());
+        dto.setCurrency(wallet.getCurrency().getCurrencyCode());
         dto.setStatus(wallet.getStatus().getStatusName());
 
         return dto;
+    }
+
+    public Wallet fromWalletDtoInCreateToWallet (WalletDtoInCreate walletDtoInCreate, User userAuthenticated) {
+        Wallet wallet = new Wallet();
+
+        wallet.setName(walletDtoInCreate.getName());
+        wallet.setCurrency(currencyService.getCurrencyByCurrencyCode(walletDtoInCreate.getCurrencyCode()));
+        wallet.setUser(userAuthenticated);
+        wallet.setStatus(statusService.getStatusById(1));
+
+        return wallet;
     }
 }

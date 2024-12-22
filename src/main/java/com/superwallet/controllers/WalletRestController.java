@@ -6,9 +6,12 @@ import com.superwallet.helpers.AuthenticationHelper;
 import com.superwallet.helpers.ModelMapper;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
+import com.superwallet.models.dto.WalletDtoInCreate;
 import com.superwallet.models.dto.WalletDtoOut;
 import com.superwallet.services.interfaces.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,22 @@ public class WalletRestController {
         this.walletService = walletService;
     }
 
+    @PostMapping
+    public WalletDtoOut createWallet(@RequestHeader HttpHeaders httpHeaders,
+                               @Valid @RequestBody WalletDtoInCreate walletDtoInCreate) {
+        try {
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
+            Wallet wallet = modelMapper.fromWalletDtoInCreateToWallet(walletDtoInCreate, userAuthenticated);
+            walletService.createWallet(wallet);
+
+            return modelMapper.fromWalletTOWalletDtoOut(wallet);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (AuthorizationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
     @GetMapping("{walletId}")
     public WalletDtoOut getWalletById(@PathVariable int walletId, @RequestHeader HttpHeaders httpHeaders) {
 
@@ -44,13 +63,5 @@ public class WalletRestController {
         }
     }
 
-//    @GetMapping("/{walletId}/balance")
-//    public double getWalletBalance(@PathVariable int walletId, @RequestHeader HttpHeaders httpHeaders) {
-//
-//        try {
-//            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-//
-//            return
-//        }
-//    }
+
 }
