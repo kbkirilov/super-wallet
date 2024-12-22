@@ -37,12 +37,12 @@ public class User {
 
     @OneToOne
     @JoinColumn(name = "role_id")
-    private Role roleId;
+    private Role role;
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     private Set<PocketMoney> pocketMoney;
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     private Set<Wallet> wallets;
 
     public User() {
@@ -104,12 +104,12 @@ public class User {
         this.address = address;
     }
 
-    public Role getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoleId(Role roleId) {
-        this.roleId = roleId;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Set<PocketMoney> getPocketMoney() {

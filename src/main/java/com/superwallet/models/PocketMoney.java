@@ -18,11 +18,11 @@ public class PocketMoney {
 
     @OneToOne
     @JoinColumn(name = "currency_id")
-    private Currency currencyId;
+    private Currency currency;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     public PocketMoney() {
     }
@@ -43,20 +43,20 @@ public class PocketMoney {
         this.amount = amount;
     }
 
-    public Currency getCurrencyId() {
-        return currencyId;
+    public Currency getCurrency() {
+        return currency;
     }
 
-    public void setCurrencyId(Currency currencyId) {
-        this.currencyId = currencyId;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
