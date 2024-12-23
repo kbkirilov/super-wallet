@@ -2,7 +2,7 @@ package com.superwallet.services.interfaces;
 
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
-import com.superwallet.models.dto.WalletDtoDeposit;
+import com.superwallet.models.dto.WalletDtoDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +17,7 @@ public interface WalletService {
 
     Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate walletDtoInUpdate);
 
-    Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDeposit walletDtoDeposit);
+    Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDepositWithdrawal walletDtoDepositWithdrawal);
+
+    Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoDepositWithdrawal walletDtoDepositWithdrawal);
 }

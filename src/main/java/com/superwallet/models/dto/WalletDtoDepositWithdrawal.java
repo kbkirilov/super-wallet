@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 
-public class WalletDtoDeposit {
+public class WalletDtoDepositWithdrawal {
 
     @DecimalMin(value = "0.01", message = "Balance must be greater than 0.01")
     private BigDecimal funds;
@@ -13,7 +13,7 @@ public class WalletDtoDeposit {
     @Min(value = 1, message = "Pocket money ID must be greater than 0.")
     private int pocketMoneyId;
 
-    public WalletDtoDeposit() {
+    public WalletDtoDepositWithdrawal() {
     }
 
     public BigDecimal getFunds() {

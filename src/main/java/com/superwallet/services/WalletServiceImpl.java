@@ -6,7 +6,7 @@ import com.superwallet.exceptions.EntityNotFoundException;
 import com.superwallet.models.PocketMoney;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
-import com.superwallet.models.dto.WalletDtoDeposit;
+import com.superwallet.models.dto.WalletDtoDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.repositories.interfaces.WalletJpaRepository;
 import com.superwallet.services.interfaces.CurrencyService;
@@ -75,8 +75,10 @@ public class WalletServiceImpl implements WalletService {
         }
 
         if (dtoInUpdate.getCurrencyCode() != null) {
-            checkIfCurrencyUpdateIsAllowed(walletToUpdate);
-            walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(dtoInUpdate.getCurrencyCode()));
+            if (!dtoInUpdate.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
+                checkIfCurrencyUpdateIsAllowed(walletToUpdate);
+                walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(dtoInUpdate.getCurrencyCode()));
+            }
         }
 
         walletJpaRepository.save(walletToUpdate);
@@ -86,21 +88,38 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDeposit dto) {
+    public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDepositWithdrawal dto) {
         checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
 
         if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
-            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_IN_YOUR_POCKET);
+            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
         }
 
-        pocketMoneyService.withdrawFunds(pocketMoneyOfUser, dto);
-
+        pocketMoneyService.withdrawFundsFromPocket(pocketMoneyOfUser, dto);
         walletToDeposit.setBalance(walletToDeposit.getBalance().add(dto.getFunds()));
         walletJpaRepository.save(walletToDeposit);
 
         return walletToDeposit;
+    }
+
+    @Override
+    @Transactional
+    public Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoDepositWithdrawal dto) {
+        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
+        PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
+        checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
+
+        if (walletToWithdraw.getBalance().compareTo(dto.getFunds()) < 0) {
+            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
+        }
+
+        walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
+        pocketMoneyService.depositFundsToPocket(pocketMoneyOfUser, dto);
+        walletJpaRepository.save(walletToWithdraw);
+
+        return walletToWithdraw;
     }
 
     @Override
