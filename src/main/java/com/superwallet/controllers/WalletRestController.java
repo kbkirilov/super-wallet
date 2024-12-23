@@ -23,18 +23,21 @@ public class WalletRestController {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public WalletRestController(AuthenticationHelper authenticationHelper, ModelMapper modelMapper, WalletService walletService) {
+    public WalletRestController(AuthenticationHelper authenticationHelper,
+                                ModelMapper modelMapper,
+                                WalletService walletService) {
+
         this.authenticationHelper = authenticationHelper;
         this.modelMapper = modelMapper;
         this.walletService = walletService;
     }
 
     @PostMapping
-    public WalletDtoOutWhole createWallet(@RequestHeader HttpHeaders httpHeaders,
-                                          @Valid @RequestBody WalletDtoInCreate walletDtoInCreate) {
+    public WalletDtoOutWhole createWallet(@RequestHeader HttpHeaders headers,
+                                          @Valid @RequestBody WalletDtoInCreate dto) {
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet wallet = modelMapper.fromWalletDtoInCreateToWallet(walletDtoInCreate, userAuthenticated);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet wallet = modelMapper.fromWalletDtoInCreateToWallet(dto, userAuthenticated);
             walletService.createWallet(wallet);
 
             return modelMapper.fromWalletTOWalletDtoOut(wallet);
@@ -45,12 +48,12 @@ public class WalletRestController {
         }
     }
 
-    @GetMapping("{walletId}")
-    public WalletDtoOutWhole getWalletById(@PathVariable int walletId, @RequestHeader HttpHeaders httpHeaders) {
+    @GetMapping("{id}")
+    public WalletDtoOutWhole getWalletById(@PathVariable int id, @RequestHeader HttpHeaders headers) {
 
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet wallet = walletService.getWalletById(userAuthenticated, walletId);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet wallet = walletService.getWalletById(userAuthenticated, id);
 
             return modelMapper.fromWalletTOWalletDtoOut(wallet);
         } catch (EntityNotFoundException e) {
@@ -60,12 +63,12 @@ public class WalletRestController {
         }
     }
 
-    @GetMapping("/{walletId}/balance")
-    public WalletDtoOutBalance getWalletBalance(@PathVariable int walletId, @RequestHeader HttpHeaders httpHeaders) {
+    @GetMapping("/{id}/balance")
+    public WalletDtoOutBalance getWalletBalance(@PathVariable int id, @RequestHeader HttpHeaders headers) {
 
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet wallet = walletService.getWalletById(userAuthenticated, walletId);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet wallet = walletService.getWalletById(userAuthenticated, id);
 
             return modelMapper.fromWalletToWalletDtoOutBalance(wallet);
         } catch (EntityNotFoundException e) {
@@ -75,15 +78,15 @@ public class WalletRestController {
         }
     }
 
-    @PutMapping("{walletId}")
-    public WalletDtoOutWhole updateWallet(@PathVariable int walletId,
-                                          @RequestHeader HttpHeaders httpHeaders,
-                                          @RequestBody WalletDtoInUpdate walletDtoInUpdate) {
+    @PutMapping("{id}")
+    public WalletDtoOutWhole updateWallet(@PathVariable int id,
+                                          @RequestHeader HttpHeaders headers,
+                                          @RequestBody WalletDtoInUpdate dto) {
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet walletToUpdate = walletService.getWalletById(userAuthenticated, walletId);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet walletToUpdate = walletService.getWalletById(userAuthenticated, id);
 
-            Wallet walletUpdated = walletService.updateWallet(userAuthenticated, walletToUpdate, walletDtoInUpdate);
+            Wallet walletUpdated = walletService.updateWallet(userAuthenticated, walletToUpdate, dto);
 
             return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
         } catch (AuthorizationException e) {
@@ -97,18 +100,18 @@ public class WalletRestController {
         }
     }
 
-    @PatchMapping("/{walletId}/deposit")
-    public WalletDtoOutWhole depositToWallet(@PathVariable int walletId,
-                                             @RequestBody WalletDtoInDepositWithdrawal walletDtoInDepositWithdrawal,
-                                             @RequestHeader HttpHeaders httpHeaders) {
+    @PatchMapping("/{id}/deposit")
+    public WalletDtoOutWhole depositToWallet(@PathVariable int id,
+                                             @RequestBody WalletDtoInDepositWithdrawal dto,
+                                             @RequestHeader HttpHeaders headers) {
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet walletToDeposit = walletService.getWalletById(userAuthenticated, walletId);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet walletToDeposit = walletService.getWalletById(userAuthenticated, id);
 
             Wallet walletUpdated = walletService.depositToWallet(
                     userAuthenticated,
                     walletToDeposit,
-                    walletDtoInDepositWithdrawal);
+                    dto);
 
             return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
         } catch (AuthorizationException e) {
@@ -120,18 +123,18 @@ public class WalletRestController {
         }
     }
 
-    @PatchMapping("/{walletId}/withdraw")
-    public WalletDtoOutWhole withdrawFromWallet(@PathVariable int walletId,
-                                                @RequestBody WalletDtoInDepositWithdrawal walletDtoInDepositWithdrawal,
-                                                @RequestHeader HttpHeaders httpHeaders) {
+    @PatchMapping("/{id}/withdraw")
+    public WalletDtoOutWhole withdrawFromWallet(@PathVariable int id,
+                                                @RequestBody WalletDtoInDepositWithdrawal dto,
+                                                @RequestHeader HttpHeaders headers) {
         try {
-            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
-            Wallet walletToWithdraw = walletService.getWalletById(userAuthenticated, walletId);
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet walletToWithdraw = walletService.getWalletById(userAuthenticated, id);
 
             Wallet walletUpdated = walletService.withdrawalFromWallet(
                     userAuthenticated,
                     walletToWithdraw,
-                    walletDtoInDepositWithdrawal);
+                    dto);
 
             return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
         } catch (AuthorizationException e) {

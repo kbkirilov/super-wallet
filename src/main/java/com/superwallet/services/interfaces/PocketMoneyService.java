@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 @Service
 public interface PocketMoneyService {
 
-    PocketMoney getPocketMoneyById (int id);
-
     void withdrawFundsFromPocket(PocketMoney pocketMoney, WalletDtoInDepositWithdrawal dto);
 
     void depositFundsToPocket(PocketMoney pocketMoney, WalletDtoInDepositWithdrawal dto);
+
+    PocketMoney getPocketMoneyById (int id);
 }
 

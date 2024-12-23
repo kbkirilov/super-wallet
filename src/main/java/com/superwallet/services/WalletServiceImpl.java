@@ -28,7 +28,11 @@ public class WalletServiceImpl implements WalletService {
     private final PocketMoneyService pocketMoneyService;
 
     @Autowired
-    public WalletServiceImpl(WalletJpaRepository walletJpaRepository, CurrencyService currencyService, StatusService statusService, PocketMoneyService pocketMoneyService) {
+    public WalletServiceImpl(WalletJpaRepository walletJpaRepository,
+                             CurrencyService currencyService,
+                             StatusService statusService,
+                             PocketMoneyService pocketMoneyService) {
+
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
         this.statusService = statusService;
@@ -41,19 +45,19 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet getWalletById(User userAuthenticated, int walletId) {
-        checkIfOwnerOfWallet(userAuthenticated, walletId);
+    public Wallet getWalletById(User userAuthenticated, int id) {
+        checkIfOwnerOfWallet(userAuthenticated, id);
 
         return walletJpaRepository
-                .getWalletByWalletId(walletId)
-                .orElseThrow(() -> new EntityNotFoundException("Wallet", walletId));
+                .getWalletByWalletId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Wallet", id));
     }
 
     @Override
-    public Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dtoInUpdate) {
+    public Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
 
         int currStatusId = walletToUpdate.getStatus().getStatusId();
-        Integer newStatusId = dtoInUpdate.getStatusId() != null ? Integer.parseInt(dtoInUpdate.getStatusId()) : null;
+        Integer newStatusId = dto.getStatusId() != null ? Integer.parseInt(dto.getStatusId()) : null;
 
         if (currStatusId == 2 && newStatusId == null) {
             throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
@@ -67,15 +71,15 @@ public class WalletServiceImpl implements WalletService {
             walletToUpdate.setStatus(statusService.getStatusById(newStatusId));
         }
 
-        if (dtoInUpdate.getName() != null) {
-            checkIfUserHasWalletWithSameName(userAuthenticated, dtoInUpdate.getName(), walletToUpdate);
-            walletToUpdate.setName(dtoInUpdate.getName());
+        if (dto.getName() != null) {
+            checkIfUserHasWalletWithSameName(userAuthenticated, dto.getName(), walletToUpdate);
+            walletToUpdate.setName(dto.getName());
         }
 
-        if (dtoInUpdate.getCurrencyCode() != null) {
-            if (!dtoInUpdate.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
+        if (dto.getCurrencyCode() != null) {
+            if (!dto.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
                 checkIfCurrencyUpdateIsAllowed(walletToUpdate);
-                walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(dtoInUpdate.getCurrencyCode()));
+                walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(dto.getCurrencyCode()));
             }
         }
 
@@ -121,10 +125,10 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public void checkIfOwnerOfWallet(User user, int walletId) {
+    public void checkIfOwnerOfWallet(User user, int id) {
         boolean isOwner = user.getWallets()
                 .stream()
-                .anyMatch(wallet -> wallet.getWalletId() == walletId);
+                .anyMatch(wallet -> wallet.getWalletId() == id);
         
         if (!isOwner) {
             throw new AuthorizationException(CAN_T_SEE_OTHER_USERS_WALLETS_ERROR_MESSAGE);
@@ -155,10 +159,10 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
-    private void checkIfUserIsOwnerOfPocketMoney (User user, int pocketMoneyId) {
+    private void checkIfUserIsOwnerOfPocketMoney (User user, int id) {
         boolean isOwner = user.getPocketMoney()
                 .stream()
-                .anyMatch(pocketMoney -> pocketMoney.getPocketMoneyId() == pocketMoneyId);
+                .anyMatch(pocketMoney -> pocketMoney.getPocketMoneyId() == id);
 
         if (!isOwner) {
             throw new AuthorizationException(YOU_ARE_ALLOWS_TO_USE_ONLY_YOUR_POCKET_MONEY);

@@ -16,9 +16,9 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Status getStatusById(int statusId) {
+    public Status getStatusById(int id) {
         return statusJpaRepository
-                .getStatusByStatusId(statusId)
-                .orElseThrow(() -> new EntityNotFoundException("Status", statusId));
+                .getStatusByStatusId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Status", id));
     }
 }
