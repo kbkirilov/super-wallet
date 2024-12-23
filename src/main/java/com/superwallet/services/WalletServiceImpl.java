@@ -4,7 +4,7 @@ import com.superwallet.exceptions.*;
 import com.superwallet.models.PocketMoney;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
-import com.superwallet.models.dto.WalletDtoDepositWithdrawal;
+import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.repositories.interfaces.WalletJpaRepository;
 import com.superwallet.services.interfaces.CurrencyService;
@@ -56,12 +56,12 @@ public class WalletServiceImpl implements WalletService {
         Integer newStatusId = dtoInUpdate.getStatusId() != null ? Integer.parseInt(dtoInUpdate.getStatusId()) : null;
 
         if (currStatusId == 2 && newStatusId == null) {
-            throw new InvalidStatusChangeException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
+            throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
 
         if (newStatusId != null) {
             if (currStatusId != 1 && newStatusId == 2) {
-                throw new InvalidStatusChangeException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
+                throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
             }
 
             walletToUpdate.setStatus(statusService.getStatusById(newStatusId));
@@ -86,7 +86,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDepositWithdrawal dto) {
+    public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
         checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
@@ -104,7 +104,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoDepositWithdrawal dto) {
+    public Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
         checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
@@ -151,7 +151,7 @@ public class WalletServiceImpl implements WalletService {
         boolean hasMoneyInWallet = wallet.getBalance().compareTo(BigDecimal.ZERO) > 0;
 
         if (hasMoneyInWallet) {
-            throw new CurrencyUpdateNotAllowedException(CURRENCY_CODE_UPDATE_NON_ZERO_BALANCE_ERROR);
+            throw new EntityUpdateNotAllowedException(CURRENCY_CODE_UPDATE_NON_ZERO_BALANCE_ERROR);
         }
     }
 
@@ -170,7 +170,7 @@ public class WalletServiceImpl implements WalletService {
         String pocketMoneyCurrencyCode = pocketMoney.getCurrency().getCurrencyCode();
 
         if (!walletCurrencyCode.equalsIgnoreCase(pocketMoneyCurrencyCode)) {
-            throw new CurrencyUpdateNotAllowedException(THE_CURRENCIES_DOES_NOT_MATCH);
+            throw new EntityUpdateNotAllowedException(THE_CURRENCIES_DOES_NOT_MATCH);
         }
     }
 

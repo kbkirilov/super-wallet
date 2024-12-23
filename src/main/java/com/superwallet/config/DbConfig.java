@@ -12,13 +12,13 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-public class HibernateConfig {
+public class DbConfig {
 
     private final String dbUrl;
     private final String dbUsername;
     private final String dbPassword;
 
-    public HibernateConfig(Environment env) {
+    public DbConfig(Environment env) {
         dbUrl = env.getProperty("database.url");
         dbUsername = env.getProperty("database.username");
         dbPassword = env.getProperty("database.password");
