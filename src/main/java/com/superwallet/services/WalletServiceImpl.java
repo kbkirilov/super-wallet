@@ -95,6 +95,8 @@ public class WalletServiceImpl implements WalletService {
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
 
+        checkIfWalletStatusAllowsUpdated(walletToDeposit);
+
         if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
             throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
         }
@@ -112,6 +114,8 @@ public class WalletServiceImpl implements WalletService {
         checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
+
+        checkIfWalletStatusAllowsUpdated(walletToWithdraw);
 
         if (walletToWithdraw.getBalance().compareTo(dto.getFunds()) < 0) {
             throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
@@ -175,6 +179,12 @@ public class WalletServiceImpl implements WalletService {
 
         if (!walletCurrencyCode.equalsIgnoreCase(pocketMoneyCurrencyCode)) {
             throw new EntityUpdateNotAllowedException(THE_CURRENCIES_DOES_NOT_MATCH);
+        }
+    }
+
+    private void checkIfWalletStatusAllowsUpdated(Wallet walletToUpdate) {
+        if (walletToUpdate.getStatus().getStatusName().equals(FROZEN_STATUS)) {
+            throw new EntityDuplicateException(FROZEN_STATUS_WALLET_ERROR_MESSAGE);
         }
     }
 

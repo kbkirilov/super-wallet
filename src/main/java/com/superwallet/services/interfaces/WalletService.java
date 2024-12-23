@@ -17,7 +17,7 @@ public interface WalletService {
 
     Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate walletDtoInUpdate);
 
-    Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal walletDtoInDepositWithdrawal);
+    Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto);
 
-    Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal walletDtoInDepositWithdrawal);
+    Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto);
 }
