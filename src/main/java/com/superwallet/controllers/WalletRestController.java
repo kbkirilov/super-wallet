@@ -7,6 +7,7 @@ import com.superwallet.helpers.AuthenticationHelper;
 import com.superwallet.helpers.ModelMapper;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
+import com.superwallet.models.dto.WalletDtoDeposit;
 import com.superwallet.models.dto.WalletDtoInCreate;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.models.dto.WalletDtoOut;
@@ -83,4 +84,42 @@ public class WalletRestController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
+
+    @PatchMapping("/{walletId}/deposit")
+    public WalletDtoOut depositToWallet(@PathVariable int walletId,
+                                       @RequestBody WalletDtoDeposit walletDtoDeposit,
+                                        @RequestHeader HttpHeaders httpHeaders) {
+        try {
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
+            Wallet walletToDeposit = walletService.getWalletById(userAuthenticated, walletId);
+
+            Wallet walletUpdated = walletService.depositToWallet(userAuthenticated, walletToDeposit, walletDtoDeposit);
+
+            return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
+        } catch (AuthorizationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

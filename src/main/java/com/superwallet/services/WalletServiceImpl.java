@@ -3,15 +3,19 @@ package com.superwallet.services;
 import com.superwallet.exceptions.AuthorizationException;
 import com.superwallet.exceptions.EntityDuplicateException;
 import com.superwallet.exceptions.EntityNotFoundException;
+import com.superwallet.models.PocketMoney;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
+import com.superwallet.models.dto.WalletDtoDeposit;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.repositories.interfaces.WalletJpaRepository;
 import com.superwallet.services.interfaces.CurrencyService;
+import com.superwallet.services.interfaces.PocketMoneyService;
 import com.superwallet.services.interfaces.StatusService;
 import com.superwallet.services.interfaces.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -19,16 +23,18 @@ import static com.superwallet.helpers.Constants.*;
 
 @Service
 public class WalletServiceImpl implements WalletService {
-    
+
     private final WalletJpaRepository walletJpaRepository;
     private final CurrencyService currencyService;
     private final StatusService statusService;
+    private final PocketMoneyService pocketMoneyService;
 
     @Autowired
-    public WalletServiceImpl(WalletJpaRepository walletJpaRepository, CurrencyService currencyService, StatusService statusService) {
+    public WalletServiceImpl(WalletJpaRepository walletJpaRepository, CurrencyService currencyService, StatusService statusService, PocketMoneyService pocketMoneyService) {
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
         this.statusService = statusService;
+        this.pocketMoneyService = pocketMoneyService;
     }
 
     @Override
@@ -79,6 +85,25 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
+    @Transactional
+    public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoDeposit dto) {
+        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
+        PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
+        checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
+
+        if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
+            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_IN_YOUR_POCKET);
+        }
+
+        pocketMoneyService.withdrawFunds(pocketMoneyOfUser, dto);
+
+        walletToDeposit.setBalance(walletToDeposit.getBalance().add(dto.getFunds()));
+        walletJpaRepository.save(walletToDeposit);
+
+        return walletToDeposit;
+    }
+
+    @Override
     public void checkIfOwnerOfWallet(User user, int walletId) {
         boolean isOwner = user.getWallets()
                 .stream()
@@ -110,6 +135,25 @@ public class WalletServiceImpl implements WalletService {
 
         if (hasMoneyInWallet) {
             throw new IllegalStateException(CURRENCY_CODE_UPDATE_NON_ZERO_BALANCE_ERROR);
+        }
+    }
+
+    private void checkIfUserIsOwnerOfPocketMoney (User user, int pocketMoneyId) {
+        boolean isOwner = user.getPocketMoney()
+                .stream()
+                .anyMatch(pocketMoney -> pocketMoney.getPocketMoneyId() == pocketMoneyId);
+
+        if (!isOwner) {
+            throw new AuthorizationException(YOU_ARE_ALLOWS_TO_USE_ONLY_YOUR_POCKET_MONEY);
+        }
+    }
+
+    private void checkCurrenciesMatch(Wallet wallet, PocketMoney pocketMoney) {
+        String walletCurrencyCode = wallet.getCurrency().getCurrencyCode();
+        String pocketMoneyCurrencyCode = pocketMoney.getCurrency().getCurrencyCode();
+
+        if (!walletCurrencyCode.equalsIgnoreCase(pocketMoneyCurrencyCode)) {
+            throw new IllegalStateException(THE_CURRENCIES_DOES_NOT_MATCH);
         }
     }
 
