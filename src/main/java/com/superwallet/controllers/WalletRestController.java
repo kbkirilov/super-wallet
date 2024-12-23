@@ -7,10 +7,7 @@ import com.superwallet.helpers.AuthenticationHelper;
 import com.superwallet.helpers.ModelMapper;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
-import com.superwallet.models.dto.WalletDtoDepositWithdrawal;
-import com.superwallet.models.dto.WalletDtoInCreate;
-import com.superwallet.models.dto.WalletDtoInUpdate;
-import com.superwallet.models.dto.WalletDtoOut;
+import com.superwallet.models.dto.*;
 import com.superwallet.services.interfaces.WalletService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +55,21 @@ public class WalletRestController {
             Wallet wallet = walletService.getWalletById(userAuthenticated, walletId);
 
             return modelMapper.fromWalletTOWalletDtoOut(wallet);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (AuthorizationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{walletId}/balance")
+    public WalletDtoOutBalance getWalletBalance(@PathVariable int walletId, @RequestHeader HttpHeaders httpHeaders) {
+
+        try {
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(httpHeaders);
+            Wallet wallet = walletService.getWalletById(userAuthenticated, walletId);
+
+            return modelMapper.fromWalletToWalletDtoOutBalance(wallet);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (AuthorizationException e) {

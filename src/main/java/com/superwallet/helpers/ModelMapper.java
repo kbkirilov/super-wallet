@@ -4,6 +4,7 @@ import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInCreate;
 import com.superwallet.models.dto.WalletDtoOut;
+import com.superwallet.models.dto.WalletDtoOutBalance;
 import com.superwallet.services.interfaces.CurrencyService;
 import com.superwallet.services.interfaces.StatusService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,13 @@ public class ModelMapper {
         wallet.setBalance(BigDecimal.ZERO);
 
         return wallet;
+    }
+
+    public WalletDtoOutBalance fromWalletToWalletDtoOutBalance (Wallet wallet) {
+        WalletDtoOutBalance dto = new WalletDtoOutBalance();
+
+        dto.setBalance(wallet.getBalance());
+
+        return dto;
     }
 }
