@@ -1,8 +1,6 @@
 package com.superwallet.services;
 
-import com.superwallet.exceptions.AuthorizationException;
-import com.superwallet.exceptions.EntityDuplicateException;
-import com.superwallet.exceptions.EntityNotFoundException;
+import com.superwallet.exceptions.*;
 import com.superwallet.models.PocketMoney;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
@@ -58,12 +56,12 @@ public class WalletServiceImpl implements WalletService {
         Integer newStatusId = dtoInUpdate.getStatusId() != null ? Integer.parseInt(dtoInUpdate.getStatusId()) : null;
 
         if (currStatusId == 2 && newStatusId == null) {
-            throw new IllegalStateException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
+            throw new InvalidStatusChangeException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
 
         if (newStatusId != null) {
             if (currStatusId != 1 && newStatusId == 2) {
-                throw new IllegalStateException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
+                throw new InvalidStatusChangeException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
             }
 
             walletToUpdate.setStatus(statusService.getStatusById(newStatusId));
@@ -94,7 +92,7 @@ public class WalletServiceImpl implements WalletService {
         checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
 
         if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
-            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
+            throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
         }
 
         pocketMoneyService.withdrawFundsFromPocket(pocketMoneyOfUser, dto);
@@ -112,7 +110,7 @@ public class WalletServiceImpl implements WalletService {
         checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
 
         if (walletToWithdraw.getBalance().compareTo(dto.getFunds()) < 0) {
-            throw new IllegalStateException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
+            throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
         }
 
         walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
@@ -153,7 +151,7 @@ public class WalletServiceImpl implements WalletService {
         boolean hasMoneyInWallet = wallet.getBalance().compareTo(BigDecimal.ZERO) > 0;
 
         if (hasMoneyInWallet) {
-            throw new IllegalStateException(CURRENCY_CODE_UPDATE_NON_ZERO_BALANCE_ERROR);
+            throw new CurrencyUpdateNotAllowedException(CURRENCY_CODE_UPDATE_NON_ZERO_BALANCE_ERROR);
         }
     }
 
@@ -172,7 +170,7 @@ public class WalletServiceImpl implements WalletService {
         String pocketMoneyCurrencyCode = pocketMoney.getCurrency().getCurrencyCode();
 
         if (!walletCurrencyCode.equalsIgnoreCase(pocketMoneyCurrencyCode)) {
-            throw new IllegalStateException(THE_CURRENCIES_DOES_NOT_MATCH);
+            throw new CurrencyUpdateNotAllowedException(THE_CURRENCIES_DOES_NOT_MATCH);
         }
     }
 

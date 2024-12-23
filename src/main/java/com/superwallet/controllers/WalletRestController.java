@@ -1,8 +1,6 @@
 package com.superwallet.controllers;
 
-import com.superwallet.exceptions.AuthorizationException;
-import com.superwallet.exceptions.EntityDuplicateException;
-import com.superwallet.exceptions.EntityNotFoundException;
+import com.superwallet.exceptions.*;
 import com.superwallet.helpers.AuthenticationHelper;
 import com.superwallet.helpers.ModelMapper;
 import com.superwallet.models.User;
@@ -92,12 +90,13 @@ public class WalletRestController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }  catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (EntityDuplicateException | IllegalStateException e) {
+        } catch (EntityDuplicateException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        } catch (InvalidStatusChangeException | CurrencyUpdateNotAllowedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
-    //TODO I don't like the illegal state exception
     @PatchMapping("/{walletId}/deposit")
     public WalletDtoOut depositToWallet(@PathVariable int walletId,
                                        @RequestBody WalletDtoDepositWithdrawal walletDtoDepositWithdrawal,
@@ -114,8 +113,10 @@ public class WalletRestController {
             return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
         } catch (AuthorizationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-        }  catch (EntityNotFoundException | IllegalStateException e) {
+        }  catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (InsufficientFundsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
@@ -135,8 +136,10 @@ public class WalletRestController {
             return modelMapper.fromWalletTOWalletDtoOut(walletUpdated);
         } catch (AuthorizationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-        }  catch (EntityNotFoundException | IllegalStateException e) {
+        }  catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (InsufficientFundsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
