@@ -2,7 +2,7 @@ package com.superwallet.models.dto;
 
 import java.math.BigDecimal;
 
-public class WalletDtoOut {
+public class WalletDtoOutWhole {
 
     private String username;
     private String name;
@@ -10,7 +10,7 @@ public class WalletDtoOut {
     private String currency;
     private String status;
 
-    public WalletDtoOut() {
+    public WalletDtoOutWhole() {
     }
 
     public String getName() {

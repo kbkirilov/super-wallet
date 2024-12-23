@@ -3,7 +3,7 @@ package com.superwallet.helpers;
 import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInCreate;
-import com.superwallet.models.dto.WalletDtoOut;
+import com.superwallet.models.dto.WalletDtoOutWhole;
 import com.superwallet.models.dto.WalletDtoOutBalance;
 import com.superwallet.services.interfaces.CurrencyService;
 import com.superwallet.services.interfaces.StatusService;
@@ -24,8 +24,8 @@ public class ModelMapper {
         this.statusService = statusService;
     }
 
-    public WalletDtoOut fromWalletTOWalletDtoOut (Wallet wallet) {
-        WalletDtoOut dto = new WalletDtoOut();
+    public WalletDtoOutWhole fromWalletTOWalletDtoOut (Wallet wallet) {
+        WalletDtoOutWhole dto = new WalletDtoOutWhole();
 
         dto.setUsername(wallet.getUser().getUsername());
         dto.setName(wallet.getName());

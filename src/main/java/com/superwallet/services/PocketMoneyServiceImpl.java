@@ -2,7 +2,7 @@ package com.superwallet.services;
 
 import com.superwallet.exceptions.EntityNotFoundException;
 import com.superwallet.models.PocketMoney;
-import com.superwallet.models.dto.WalletDtoDepositWithdrawal;
+import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.repositories.interfaces.PocketMoneyJpaRepository;
 import com.superwallet.services.interfaces.PocketMoneyService;
 import org.springframework.stereotype.Service;
@@ -24,13 +24,13 @@ public class PocketMoneyServiceImpl implements PocketMoneyService {
     }
 
     @Override
-    public void withdrawFundsFromPocket(PocketMoney pocketMoney, WalletDtoDepositWithdrawal dto) {
+    public void withdrawFundsFromPocket(PocketMoney pocketMoney, WalletDtoInDepositWithdrawal dto) {
         pocketMoney.setAmount(pocketMoney.getAmount().subtract(dto.getFunds()));
         pocketMoneyJpaRepository.save(pocketMoney);
     }
 
     @Override
-    public void depositFundsToPocket(PocketMoney pocketMoney, WalletDtoDepositWithdrawal dto) {
+    public void depositFundsToPocket(PocketMoney pocketMoney, WalletDtoInDepositWithdrawal dto) {
         pocketMoney.setAmount(pocketMoney.getAmount().add(dto.getFunds()));
         pocketMoneyJpaRepository.save(pocketMoney);
     }
