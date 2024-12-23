@@ -56,15 +56,15 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
 
-        int currStatusId = walletToUpdate.getStatus().getStatusId();
+        String currStatusStr = walletToUpdate.getStatus().getStatusName();
         Integer newStatusId = dto.getStatusId() != null ? Integer.parseInt(dto.getStatusId()) : null;
 
-        if (currStatusId == 2 && newStatusId == null) {
+        if (currStatusStr.equals(FROZEN_STATUS) && newStatusId == null) {
             throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
 
         if (newStatusId != null) {
-            if (currStatusId != 1 && newStatusId == 2) {
+            if (!currStatusStr.equals(ACTIVE_STATUS) && newStatusId == 2) {
                 throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
             }
 
@@ -91,11 +91,12 @@ public class WalletServiceImpl implements WalletService {
     @Override
     @Transactional
     public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
-        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
-        checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
 
+        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
+        checkCurrenciesMatch(walletToDeposit, pocketMoneyOfUser);
         checkIfWalletStatusAllowsUpdated(walletToDeposit);
+        checkIfValidTransactionSum(dto);
 
         if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
             throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
@@ -111,11 +112,12 @@ public class WalletServiceImpl implements WalletService {
     @Override
     @Transactional
     public Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
-        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
-        checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
 
+        checkIfUserIsOwnerOfPocketMoney(userAuthenticated, dto.getPocketMoneyId());
+        checkCurrenciesMatch(walletToWithdraw, pocketMoneyOfUser);
         checkIfWalletStatusAllowsUpdated(walletToWithdraw);
+        checkIfValidTransactionSum(dto);
 
         if (walletToWithdraw.getBalance().compareTo(dto.getFunds()) < 0) {
             throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
@@ -128,7 +130,6 @@ public class WalletServiceImpl implements WalletService {
         return walletToWithdraw;
     }
 
-    @Override
     public void checkIfOwnerOfWallet(User user, int id) {
         boolean isOwner = user.getWallets()
                 .stream()
@@ -184,7 +185,19 @@ public class WalletServiceImpl implements WalletService {
 
     private void checkIfWalletStatusAllowsUpdated(Wallet walletToUpdate) {
         if (walletToUpdate.getStatus().getStatusName().equals(FROZEN_STATUS)) {
-            throw new EntityDuplicateException(FROZEN_STATUS_WALLET_ERROR_MESSAGE);
+            throw new EntityUpdateNotAllowedException(FROZEN_STATUS_WALLET_ERROR_MESSAGE);
+        }
+    }
+
+    private void checkIfValidTransactionSum (WalletDtoInDepositWithdrawal dto) {
+        if (dto.getFunds().compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidTransactionSumException(NEGATIVE_TRANSACTION_SUM_ERROR_MESSAGE);
+        }
+
+        if (dto.getFunds().compareTo(MIN_TRANSACTION_SUM) <= 0) {
+            throw new InvalidTransactionSumException(String.format(
+                    LESS_TRANSACTION_SUM_ERROR_MESSAGE,
+                    MIN_TRANSACTION_SUM.toString()));
         }
     }
 

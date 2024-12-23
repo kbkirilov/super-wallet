@@ -118,7 +118,7 @@ public class WalletRestController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }  catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (InsufficientFundsException e) {
+        } catch (InsufficientFundsException | EntityUpdateNotAllowedException | InvalidTransactionSumException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -141,7 +141,7 @@ public class WalletRestController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }  catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (InsufficientFundsException e) {
+        } catch (InsufficientFundsException | EntityUpdateNotAllowedException | InvalidTransactionSumException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

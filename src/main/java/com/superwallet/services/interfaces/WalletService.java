@@ -11,8 +11,6 @@ public interface WalletService {
 
     void createWallet(Wallet wallet);
 
-    void checkIfOwnerOfWallet(User userAuthenticated, int walletId);
-
     Wallet getWalletById(User userAuthenticated, int walletId);
 
     Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate walletDtoInUpdate);
