@@ -4,9 +4,7 @@ import com.superwallet.models.User;
 import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface WalletService {
 
     void createWallet(Wallet wallet);

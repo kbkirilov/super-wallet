@@ -2,7 +2,7 @@
 
 ## 💡 Description
 
-SupperWallet is simple API that allows users to interact with a virtual `Wallet`. <br>
+SupperWallet is simple API that allows users to interact with a virtual `Wallet`. It is build according to the layered architecture style, where we are layers for the controllers, services and repositories. <br>
 
 Each `User` can have multiple wallets as his possession. 
 
