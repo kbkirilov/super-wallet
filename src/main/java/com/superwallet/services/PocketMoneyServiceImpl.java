@@ -5,6 +5,7 @@ import com.superwallet.models.PocketMoney;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.repositories.interfaces.PocketMoneyJpaRepository;
 import com.superwallet.services.interfaces.PocketMoneyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,7 @@ public class PocketMoneyServiceImpl implements PocketMoneyService {
 
     private final PocketMoneyJpaRepository pocketMoneyJpaRepository;
 
+    @Autowired
     public PocketMoneyServiceImpl(PocketMoneyJpaRepository pocketMoneyJpaRepository) {
         this.pocketMoneyJpaRepository = pocketMoneyJpaRepository;
     }

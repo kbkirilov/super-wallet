@@ -4,6 +4,7 @@ import com.superwallet.exceptions.EntityNotFoundException;
 import com.superwallet.models.Status;
 import com.superwallet.repositories.interfaces.StatusJpaRepository;
 import com.superwallet.services.interfaces.StatusService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +12,7 @@ public class StatusServiceImpl implements StatusService {
 
     private final StatusJpaRepository statusJpaRepository;
 
+    @Autowired
     public StatusServiceImpl(StatusJpaRepository statusJpaRepository) {
         this.statusJpaRepository = statusJpaRepository;
     }
