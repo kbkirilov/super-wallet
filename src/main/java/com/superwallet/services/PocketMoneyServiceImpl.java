@@ -1,12 +1,16 @@
 package com.superwallet.services;
 
+import com.superwallet.exceptions.AuthorizationException;
 import com.superwallet.exceptions.EntityNotFoundException;
 import com.superwallet.models.PocketMoney;
+import com.superwallet.models.User;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.repositories.interfaces.PocketMoneyJpaRepository;
 import com.superwallet.services.interfaces.PocketMoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.superwallet.helpers.Constants.YOU_ARE_ALLOWS_TO_USE_ONLY_YOUR_POCKET_MONEY;
 
 @Service
 public class PocketMoneyServiceImpl implements PocketMoneyService {

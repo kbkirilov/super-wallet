@@ -1,6 +1,7 @@
 package com.superwallet.services.interfaces;
 
 import com.superwallet.models.PocketMoney;
+import com.superwallet.models.User;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 
 public interface PocketMoneyService {
