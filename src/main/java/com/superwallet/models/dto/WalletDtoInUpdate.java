@@ -17,9 +17,6 @@ public class WalletDtoInUpdate {
     @Min(value = 1, message = "Status ID must be greater than 0.")
     private String statusId;
 
-    @DecimalMin(value = "0.01", message = "Balance must be greater than 0.01")
-    private BigDecimal balance;
-
     public WalletDtoInUpdate() {
     }
 
@@ -45,13 +42,5 @@ public class WalletDtoInUpdate {
 
     public void setStatusId(String statusId) {
         this.statusId = statusId;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
     }
 }
