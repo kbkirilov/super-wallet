@@ -51,6 +51,67 @@ You can find it in `super-wallet/db`.
 * 🌐 REST API
 * 📦 Gradle
 
+## ➡️ How to test it
+
+### 🌐 Endpoint: `GET /api/wallets/1`
+Retrieves the wallet details for the wallet with ID `1`
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+---
+### 🌐 Endpoint: `GET /api/wallets/1/balance`
+Retrieves the balance of the wallet with ID `1`
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+---
+### 🌐 Endpoint: `POST /api/wallets`
+Create a new wallet
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+### Sample Request Body:
+```json
+{
+    "name": "New House",
+    "currencyCode": "EUR"
+}
+```
+---
+### 🌐 Endpoint: `PUT /api/wallets/1`
+Updates the details of wallet with ID `1`
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+### Sample Request Body:
+```json
+{
+  "name": "Friday's cinema",
+  "currencyCode": "BGN",
+  "statusId": "1"
+}
+```
+---
+### 🌐 Endpoint: `PATCH /api/wallets/1/deposit`
+Make a deposit to a wallet with ID `1` if possible
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+### Sample Request Body:
+```json
+{
+  "funds": 50.00,
+  "pocketMoneyId": 1
+}
+```
+---
+### 🌐 Endpoint: `PATCH /api/wallets/1/withdraw`
+Make a withdrawal from a wallet with ID `1` if possible
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+### Sample Request Body:
+```json
+{
+  "funds": 20.00,
+  "pocketMoneyId": 1
+}
+```
+---
 ## 💳 Wallet `/api/wallets`
 
 ### GET
