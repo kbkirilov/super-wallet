@@ -17,6 +17,6 @@ public class Constants {
     public static final String FROZEN_STATUS = "Frozen";
     public static final String ACTIVE_STATUS = "Active";
 
-    public static final BigDecimal MIN_TRANSACTION_SUM = new BigDecimal("0.00");
+    public static final BigDecimal MIN_TRANSACTION_SUM = new BigDecimal("0.01");
 
 }
