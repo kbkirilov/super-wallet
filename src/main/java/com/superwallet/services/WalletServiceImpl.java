@@ -57,35 +57,46 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public Wallet updateWallet(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
 
-        String currStatus = walletToUpdate.getStatus().getStatusName();
-        Optional<Integer> parsedStatusId = Optional.ofNullable(dto.getStatusId()).map(Integer::parseInt);
-        Optional<String> parsedName = Optional.ofNullable(dto.getName());
-        Optional<String> parsedCurrencyCode = Optional.ofNullable(dto.getCurrencyCode());
+        validateWalletUpdate(userAuthenticated, walletToUpdate, dto);
 
-        throwIfWalletStatusDoesNotAllowUpdates(walletToUpdate, parsedStatusId);
-
-        parsedStatusId.ifPresent(statusId -> {
-            if (!currStatus.equals(ACTIVE_STATUS) && statusId == 2) {
-                throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
-            }
-            walletToUpdate.setStatus(statusService.getStatusById(statusId));
-        });
-
-        if (parsedName.isPresent()) {
-            throwIfWalletNameAlreadyExistsWithinUsersWallets(userAuthenticated, dto.getName(), walletToUpdate);
-            walletToUpdate.setName(dto.getName());
-        }
-
-        if (parsedCurrencyCode.isPresent()) {
-            if (!dto.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
-                throwIfCurrencyUpdateIsNotAllowed(walletToUpdate);
-                walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(dto.getCurrencyCode()));
-            }
-        }
+        updateWalletStatus(walletToUpdate, dto);
+        updateWalletName(walletToUpdate, dto);
+        updateWalletCurrency(walletToUpdate, dto);
 
         walletJpaRepository.save(walletToUpdate);
 
         return walletToUpdate;
+    }
+
+    private void updateWalletStatus(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getStatusId())
+                .map(Integer::parseInt)
+                .ifPresent(statusId -> walletToUpdate.setStatus(statusService.getStatusById(statusId)));
+    }
+
+    private void updateWalletName(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getName()).ifPresent(walletToUpdate::setName);
+    }
+
+    private void updateWalletCurrency(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getCurrencyCode())
+                .filter(currencyCode -> !currencyCode.equals(walletToUpdate.getCurrency().getCurrencyCode()))
+                .ifPresent(currencyCode -> walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(currencyCode)));
+    }
+
+    private void validateWalletUpdate(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional<Integer> parsedStatusId = Optional.ofNullable(dto.getStatusId()).map(Integer::parseInt);
+        throwIfWalletStatusDoesNotAllowUpdates(walletToUpdate, parsedStatusId);
+
+        Optional<String> parsedName = Optional.ofNullable(dto.getName());
+        if (parsedName.isPresent()) {
+            throwIfWalletNameAlreadyExistsWithinUsersWallets(userAuthenticated, dto.getName(), walletToUpdate);
+        }
+
+        Optional<String> parsedCurrencyCode = Optional.ofNullable(dto.getCurrencyCode());
+        if (parsedCurrencyCode.isPresent() && !dto.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
+            throwIfCurrencyUpdateIsNotAllowed(walletToUpdate);
+        }
     }
 
     @Override
@@ -157,12 +168,16 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void throwIfWalletStatusDoesNotAllowUpdates(Wallet wallet, Optional<Integer> newStatusId) {
+        if (wallet.getStatus().getStatusName().equals(FROZEN_STATUS) && newStatusId.map(id -> id == 1).orElse(false)) {
+            return;
+        }
+
         if (wallet.getStatus().getStatusName().equals(FROZEN_STATUS) && newStatusId.isEmpty()) {
             throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
 
         if (wallet.getStatus().getStatusName().equals(FROZEN_STATUS)) {
-            throw new EntityUpdateNotAllowedException(FROZEN_STATUS_WALLET_ERROR_MESSAGE);
+            throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
     }
 
