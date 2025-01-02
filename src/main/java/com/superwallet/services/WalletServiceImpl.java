@@ -68,37 +68,6 @@ public class WalletServiceImpl implements WalletService {
         return walletToUpdate;
     }
 
-    private void updateWalletStatus(Wallet walletToUpdate, WalletDtoInUpdate dto) {
-        Optional.ofNullable(dto.getStatusId())
-                .map(Integer::parseInt)
-                .ifPresent(statusId -> walletToUpdate.setStatus(statusService.getStatusById(statusId)));
-    }
-
-    private void updateWalletName(Wallet walletToUpdate, WalletDtoInUpdate dto) {
-        Optional.ofNullable(dto.getName()).ifPresent(walletToUpdate::setName);
-    }
-
-    private void updateWalletCurrency(Wallet walletToUpdate, WalletDtoInUpdate dto) {
-        Optional.ofNullable(dto.getCurrencyCode())
-                .filter(currencyCode -> !currencyCode.equals(walletToUpdate.getCurrency().getCurrencyCode()))
-                .ifPresent(currencyCode -> walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(currencyCode)));
-    }
-
-    private void validateWalletUpdate(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
-        Optional<Integer> parsedStatusId = Optional.ofNullable(dto.getStatusId()).map(Integer::parseInt);
-        throwIfWalletStatusDoesNotAllowUpdates(walletToUpdate, parsedStatusId);
-
-        Optional<String> parsedName = Optional.ofNullable(dto.getName());
-        if (parsedName.isPresent()) {
-            throwIfWalletNameAlreadyExistsWithinUsersWallets(userAuthenticated, dto.getName(), walletToUpdate);
-        }
-
-        Optional<String> parsedCurrencyCode = Optional.ofNullable(dto.getCurrencyCode());
-        if (parsedCurrencyCode.isPresent() && !dto.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
-            throwIfCurrencyUpdateIsNotAllowed(walletToUpdate);
-        }
-    }
-
     @Override
     @Transactional
     public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
@@ -243,5 +212,36 @@ public class WalletServiceImpl implements WalletService {
         pocketMoneyService.depositFundsToPocket(pocketMoneyOfUser, dto);
         walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
         walletJpaRepository.save(walletToWithdraw);
+    }
+
+    private void updateWalletStatus(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getStatusId())
+                .map(Integer::parseInt)
+                .ifPresent(statusId -> walletToUpdate.setStatus(statusService.getStatusById(statusId)));
+    }
+
+    private void updateWalletName(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getName()).ifPresent(walletToUpdate::setName);
+    }
+
+    private void updateWalletCurrency(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.ofNullable(dto.getCurrencyCode())
+                .filter(currencyCode -> !currencyCode.equals(walletToUpdate.getCurrency().getCurrencyCode()))
+                .ifPresent(currencyCode -> walletToUpdate.setCurrency(currencyService.getCurrencyByCurrencyCode(currencyCode)));
+    }
+
+    private void validateWalletUpdate(User userAuthenticated, Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional<Integer> parsedStatusId = Optional.ofNullable(dto.getStatusId()).map(Integer::parseInt);
+        throwIfWalletStatusDoesNotAllowUpdates(walletToUpdate, parsedStatusId);
+
+        Optional<String> parsedName = Optional.ofNullable(dto.getName());
+        if (parsedName.isPresent()) {
+            throwIfWalletNameAlreadyExistsWithinUsersWallets(userAuthenticated, dto.getName(), walletToUpdate);
+        }
+
+        Optional<String> parsedCurrencyCode = Optional.ofNullable(dto.getCurrencyCode());
+        if (parsedCurrencyCode.isPresent() && !dto.getCurrencyCode().equals(walletToUpdate.getCurrency().getCurrencyCode())) {
+            throwIfCurrencyUpdateIsNotAllowed(walletToUpdate);
+        }
     }
 }
