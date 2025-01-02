@@ -1,10 +1,8 @@
 package com.superwallet.services;
 
-import com.superwallet.exceptions.AuthorizationException;
 import com.superwallet.exceptions.EntityNotFoundException;
 import com.superwallet.exceptions.InsufficientFundsException;
 import com.superwallet.models.PocketMoney;
-import com.superwallet.models.User;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.repositories.interfaces.PocketMoneyJpaRepository;
 import com.superwallet.services.interfaces.PocketMoneyService;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-import static com.superwallet.helpers.Constants.YOU_ARE_ALLOWS_TO_USE_ONLY_YOUR_POCKET_MONEY;
 import static com.superwallet.helpers.Constants.YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE;
 
 @Service
