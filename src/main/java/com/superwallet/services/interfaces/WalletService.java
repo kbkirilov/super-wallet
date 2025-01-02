@@ -6,6 +6,7 @@ import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface WalletService {
@@ -20,13 +21,15 @@ public interface WalletService {
 
     void throwIfCurrencyUpdateIsNotAllowed(Wallet wallet);
 
-    void throwIfWalletStatusDoesNotAllowsUpdates(Wallet wallet);
+    void throwIfWalletStatusDoesNotAllowUpdates(Wallet wallet);
 
-    void throwIfWalletStatusDoesNotAllowsUpdates(Wallet wallet, Optional<Integer> newStatusId);
+    void throwIfWalletStatusDoesNotAllowUpdates(Wallet wallet, Optional<Integer> newStatusId);
 
     void throwIfTransactionAmountIsNotValid(WalletDtoInDepositWithdrawal dto);
 
     void throwIfWalletNameAlreadyExistsWithinUsersWallets(User user, String walletNameToUpdate, Wallet walletToUpdate);
+
+    void throwIfNotEnoughFundsInWallet(BigDecimal walletFunds, WalletDtoInDepositWithdrawal dto);
 
     Wallet getWalletById(User userAuthenticated, int walletId);
 

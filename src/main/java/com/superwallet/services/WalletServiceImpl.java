@@ -62,7 +62,7 @@ public class WalletServiceImpl implements WalletService {
         Optional<String> parsedName = Optional.ofNullable(dto.getName());
         Optional<String> parsedCurrencyCode = Optional.ofNullable(dto.getCurrencyCode());
 
-        throwIfWalletStatusDoesNotAllowsUpdates(walletToUpdate, parsedStatusId);
+        throwIfWalletStatusDoesNotAllowUpdates(walletToUpdate, parsedStatusId);
 
         parsedStatusId.ifPresent(statusId -> {
             if (!currStatus.equals(ACTIVE_STATUS) && statusId == 2) {
@@ -91,20 +91,12 @@ public class WalletServiceImpl implements WalletService {
     @Override
     @Transactional
     public Wallet depositToWallet(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
-        PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
+        PocketMoney pocketMoneyOfUser = fetchAndValidatePocketMoney(userAuthenticated, dto, walletToDeposit);
 
-        throwIfNotPocketMoneyOwner(userAuthenticated, dto.getPocketMoneyId());
-        throwIfCurrenciesDoNotMatch(walletToDeposit, pocketMoneyOfUser);
-        throwIfWalletStatusDoesNotAllowsUpdates(walletToDeposit);
-        throwIfTransactionAmountIsNotValid(dto);
+        validateWalletStatus(walletToDeposit);
+        validateTransactionAmount(dto);
 
-        if (pocketMoneyOfUser.getAmount().compareTo(dto.getFunds()) < 0) {
-            throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
-        }
-
-        pocketMoneyService.withdrawFundsFromPocket(pocketMoneyOfUser, dto);
-        walletToDeposit.setBalance(walletToDeposit.getBalance().add(dto.getFunds()));
-        walletJpaRepository.save(walletToDeposit);
+        processDeposit(pocketMoneyOfUser, walletToDeposit, dto);
 
         return walletToDeposit;
     }
@@ -112,22 +104,21 @@ public class WalletServiceImpl implements WalletService {
     @Override
     @Transactional
     public Wallet withdrawalFromWallet(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
-        PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
+        PocketMoney pocketMoneyOfUser = fetchAndValidatePocketMoney(userAuthenticated, dto, walletToWithdraw);
 
-        throwIfNotPocketMoneyOwner(userAuthenticated, dto.getPocketMoneyId());
-        throwIfCurrenciesDoNotMatch(walletToWithdraw, pocketMoneyOfUser);
-        throwIfWalletStatusDoesNotAllowsUpdates(walletToWithdraw);
-        throwIfTransactionAmountIsNotValid(dto);
+        validateWalletStatus(walletToWithdraw);
+        validateTransactionAmount(dto, walletToWithdraw);
 
-        if (walletToWithdraw.getBalance().compareTo(dto.getFunds()) < 0) {
-            throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
-        }
-
-        walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
-        pocketMoneyService.depositFundsToPocket(pocketMoneyOfUser, dto);
-        walletJpaRepository.save(walletToWithdraw);
+        processWithdrawal(pocketMoneyOfUser, walletToWithdraw, dto);
 
         return walletToWithdraw;
+    }
+
+    @Override
+    public void throwIfNotEnoughFundsInWallet(BigDecimal walletFunds, WalletDtoInDepositWithdrawal dto) {
+        if (walletFunds.compareTo(dto.getFunds()) < 0) {
+            throw new InsufficientFundsException(YOU_DON_T_HAVE_ENOUGH_FUNDS_ERROR_MESSAGE);
+        }
     }
 
     @Override
@@ -160,12 +151,12 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public void throwIfWalletStatusDoesNotAllowsUpdates(Wallet wallet) {
-        throwIfWalletStatusDoesNotAllowsUpdates(wallet, Optional.empty());
+    public void throwIfWalletStatusDoesNotAllowUpdates(Wallet wallet) {
+        throwIfWalletStatusDoesNotAllowUpdates(wallet, Optional.empty());
     }
 
     @Override
-    public void throwIfWalletStatusDoesNotAllowsUpdates(Wallet wallet, Optional<Integer> newStatusId) {
+    public void throwIfWalletStatusDoesNotAllowUpdates(Wallet wallet, Optional<Integer> newStatusId) {
         if (wallet.getStatus().getStatusName().equals(FROZEN_STATUS) && newStatusId.isEmpty()) {
             throw new EntityUpdateNotAllowedException(CURRENT_STATUS_CHANGES_ERROR_MESSAGE);
         }
@@ -196,5 +187,46 @@ public class WalletServiceImpl implements WalletService {
         if (duplicateNameExists) {
             throw new EntityDuplicateException("Wallet", "name", walletNameToUpdate);
         }
+    }
+
+    private PocketMoney fetchAndValidatePocketMoney(User userAuthenticated, WalletDtoInDepositWithdrawal dto, Wallet walletToDeposit) {
+        PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
+        validatePocketMoneyOwnership(userAuthenticated, dto.getPocketMoneyId());
+        validateCurrencyMatch(walletToDeposit, pocketMoneyOfUser);
+
+        return pocketMoneyOfUser;
+    }
+
+    private void validatePocketMoneyOwnership(User userAuthenticated, int pocketMoneyId) {
+        throwIfNotPocketMoneyOwner(userAuthenticated, pocketMoneyId);
+    }
+
+    private void validateCurrencyMatch(Wallet walletToDeposit, PocketMoney pocketMoneyOfUser) {
+        throwIfCurrenciesDoNotMatch(walletToDeposit, pocketMoneyOfUser);
+    }
+
+    private void validateWalletStatus(Wallet walletToDeposit) {
+        throwIfWalletStatusDoesNotAllowUpdates(walletToDeposit);
+    }
+
+    private void validateTransactionAmount(WalletDtoInDepositWithdrawal dto) {
+        throwIfTransactionAmountIsNotValid(dto);
+    }
+
+    private void validateTransactionAmount(WalletDtoInDepositWithdrawal dto, Wallet wallet) {
+        throwIfTransactionAmountIsNotValid(dto);
+        throwIfNotEnoughFundsInWallet(wallet.getBalance(), dto);
+    }
+
+    private void processDeposit(PocketMoney pocketMoneyOfUser, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
+        pocketMoneyService.withdrawFundsFromPocket(pocketMoneyOfUser, dto);
+        walletToDeposit.setBalance(walletToDeposit.getBalance().add(dto.getFunds()));
+        walletJpaRepository.save(walletToDeposit);
+    }
+
+    private void processWithdrawal(PocketMoney pocketMoneyOfUser, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
+        pocketMoneyService.depositFundsToPocket(pocketMoneyOfUser, dto);
+        walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
+        walletJpaRepository.save(walletToWithdraw);
     }
 }

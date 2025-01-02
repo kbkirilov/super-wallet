@@ -171,14 +171,14 @@ public class WalletServiceImplTests {
         mockWallet.setStatus(mockStatusFrozen);
 
         assertThrows(EntityUpdateNotAllowedException.class,
-                () -> mockWalletService.throwIfWalletStatusDoesNotAllowsUpdates(mockWallet));
+                () -> mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet));
     }
 
     @Test
     public void throwIfWalletStatusDoesNotAllowsUpdates_ShouldNotThrow_When_WalletStatusIsActive() {
         Wallet mockWallet = createMockWallet();
 
-        mockWalletService.throwIfWalletStatusDoesNotAllowsUpdates(mockWallet);
+        mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet);
     }
 
     @Test
@@ -189,7 +189,7 @@ public class WalletServiceImplTests {
         Optional<Integer> mockNewStatusId = Optional.empty();
 
         assertThrows(EntityUpdateNotAllowedException.class,
-                () -> mockWalletService.throwIfWalletStatusDoesNotAllowsUpdates(mockWallet, mockNewStatusId));
+                () -> mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet, mockNewStatusId));
     }
 
     @Test
@@ -200,7 +200,7 @@ public class WalletServiceImplTests {
         Optional<Integer> mockNewStatusId = Optional.of(1);
 
         assertThrows(EntityUpdateNotAllowedException.class,
-                () -> mockWalletService.throwIfWalletStatusDoesNotAllowsUpdates(mockWallet, mockNewStatusId));
+                () -> mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet, mockNewStatusId));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class WalletServiceImplTests {
         Wallet mockWallet = createMockWallet();
         Optional<Integer> mockNewStatusId = Optional.of(1);
 
-        mockWalletService.throwIfWalletStatusDoesNotAllowsUpdates(mockWallet, mockNewStatusId);
+        mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet, mockNewStatusId);
     }
 
     @Test
