@@ -53,6 +53,13 @@ You can find it in `super-wallet/db`.
 
 ## ➡️ How to test it
 
+The happy path: Kitodar Todorov has decided to save money for a trip to Kosovo. He has got a few bucks in his pocket, but he wants to transfer them to an online
+wallet. He has already registered in the super wallet system, so the next step will be to create a new wallet. He gives it a name: "Kosovo trip"
+and sets the currency to BGN. Later he remembers that this may not be the most appropriate currency, so he changes it to USD 
+and the wallet's name to "Summer 2025". Now he transfers a few dollar from his pocket to the wallet. Once that is done, he sets the wallet's status to frozen.
+for extra security. A few days later he decides to make another deposit, but fails to do so because he forgot to change the wallet's status. Once the status is changed back to 
+active, he can make the deposit. 
+
 ### 🌐 Endpoint: `GET /api/wallets/1`
 Retrieves the wallet details for the wallet with ID `1`
 ### Required Headers:

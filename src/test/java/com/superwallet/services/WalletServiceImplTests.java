@@ -193,11 +193,11 @@ public class WalletServiceImplTests {
     }
 
     @Test
-    public void throwIfWalletStatusDoesNotAllowsUpdates_ShouldThrow_When_WalletStatusIsFrozenAndNewStatusIdIsPresent() {
+    public void throwIfWalletStatusDoesNotAllowsUpdates_ShouldThrow_When_WalletStatusIsFrozenAndNewStatusIdIsFrozen() {
         Wallet mockWallet = createMockWallet();
         Status mockStatusFrozen = createMockStatusFrozen();
         mockWallet.setStatus(mockStatusFrozen);
-        Optional<Integer> mockNewStatusId = Optional.of(1);
+        Optional<Integer> mockNewStatusId = Optional.of(2);
 
         assertThrows(EntityUpdateNotAllowedException.class,
                 () -> mockWalletService.throwIfWalletStatusDoesNotAllowUpdates(mockWallet, mockNewStatusId));
