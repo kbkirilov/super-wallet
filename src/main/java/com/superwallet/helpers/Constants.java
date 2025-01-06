@@ -13,6 +13,33 @@ public class Constants {
     public static final String NEGATIVE_TRANSACTION_SUM_ERROR_MESSAGE = "The transaction sum cannot be negative.";
     public static final String LESS_TRANSACTION_SUM_ERROR_MESSAGE = "The transaction sum must be greater than %s";
 
+    public static final String SUCCESSFUL_DEPOSIT_SUBJECT_MESSAGE = "Successful deposit to your %s wallet!";
+    public static final String SUCCESSFUL_WITHDRAWAL_SUBJECT_MESSAGE = "Successful withdrawal from your %s wallet!";
+    public static final String SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_HTMLCONTENT_MESSAGE = """
+                <html>
+                <body>
+                <p>Hello, <strong>%s</strong></p>
+                
+                <p>We are sending this email to let you know that a <strong>%s</strong> at the value of <strong>%s</strong>%s has been made %s your wallet with name: <strong>%s</strong>.</p>
+                
+                <p>If you have not made this deposit, please contact us at <a href="mailto:super-wallet@abv.bg"></a>immediately.</p>
+                
+                <p>Kind Regards,<br/>
+                <em>Super-wallet team</em></p>
+                </body>
+                </html>
+                """;
+    public static final String SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_TEXTCONTENT_MESSAGE = """
+                Hello, %s
+                
+                We are sending this email to let you know that a %s at the value of %s%s has been made %s your wallet with name: %s.
+                
+                If you have not made this deposit, please contact us at super-wallet@abv.bg immediately.
+                
+                Kind Regards,
+                Super-wallet team
+                """;
+
     public static final String FROZEN_STATUS = "Frozen";
 
     public static final BigDecimal MIN_TRANSACTION_SUM = new BigDecimal("0.01");

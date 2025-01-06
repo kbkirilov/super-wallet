@@ -27,17 +27,19 @@ public class WalletServiceImpl implements WalletService {
     private final CurrencyService currencyService;
     private final StatusService statusService;
     private final PocketMoneyService pocketMoneyService;
+    private final MailJetServiceImpl mailJetService;
 
     @Autowired
     public WalletServiceImpl(WalletJpaRepository walletJpaRepository,
                              CurrencyService currencyService,
                              StatusService statusService,
-                             PocketMoneyService pocketMoneyService) {
+                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService) {
 
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
         this.statusService = statusService;
         this.pocketMoneyService = pocketMoneyService;
+        this.mailJetService = mailJetService;
     }
 
     @Override
@@ -62,10 +64,20 @@ public class WalletServiceImpl implements WalletService {
         updateWalletStatus(walletToUpdate, dto);
         updateWalletName(walletToUpdate, dto);
         updateWalletCurrency(walletToUpdate, dto);
+        updateDepositNotificationsPreferences(walletToUpdate, dto);
+        updateWithdrawalNotificationsPreferences(walletToUpdate, dto);
 
         walletJpaRepository.save(walletToUpdate);
 
         return walletToUpdate;
+    }
+
+    private void updateDepositNotificationsPreferences(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.of(dto.getDepositNotifications()).ifPresent(walletToUpdate::setDepositNotifications);
+    }
+
+    private void updateWithdrawalNotificationsPreferences(Wallet walletToUpdate, WalletDtoInUpdate dto) {
+        Optional.of(dto.getWithdrawalNotifications()).ifPresent(walletToUpdate::setWithdrawalNotifications);
     }
 
     @Override
@@ -78,7 +90,33 @@ public class WalletServiceImpl implements WalletService {
 
         processDeposit(pocketMoneyOfUser, walletToDeposit, dto);
 
+        sendDepositNotificationEmail(userAuthenticated, walletToDeposit, dto);
+
         return walletToDeposit;
+    }
+
+    private void sendDepositNotificationEmail(User userAuthenticated, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
+        if (walletToDeposit.getDepositNotifications() == 1) {
+            mailJetService.sendEmail(
+                    userAuthenticated.getEmail(),
+                    String.format("%s %s", userAuthenticated.getFirstName(), userAuthenticated.getLastName()),
+                    String.format(SUCCESSFUL_DEPOSIT_SUBJECT_MESSAGE, walletToDeposit.getName()),
+                    String.format(SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_TEXTCONTENT_MESSAGE,
+                            userAuthenticated.getFirstName(),
+                            "deposit",
+                            dto.getFunds(),
+                            walletToDeposit.getCurrency().getCurrencyCode(),
+                            "to",
+                            walletToDeposit.getName()),
+                    String.format(SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_TEXTCONTENT_MESSAGE,
+                            userAuthenticated.getFirstName(),
+                            "deposit",
+                            dto.getFunds(),
+                            walletToDeposit.getCurrency().getCurrencyCode(),
+                            "to",
+                            walletToDeposit.getName())
+            );
+        }
     }
 
     @Override
@@ -91,7 +129,33 @@ public class WalletServiceImpl implements WalletService {
 
         processWithdrawal(pocketMoneyOfUser, walletToWithdraw, dto);
 
+        sendWithdrawalNotificationEmail(userAuthenticated, walletToWithdraw, dto);
+
         return walletToWithdraw;
+    }
+
+    private void sendWithdrawalNotificationEmail(User userAuthenticated, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
+        if (walletToWithdraw.getWithdrawalNotifications() == 1) {
+            mailJetService.sendEmail(
+                    userAuthenticated.getEmail(),
+                    String.format("%s %s", userAuthenticated.getFirstName(), userAuthenticated.getLastName()),
+                    String.format(SUCCESSFUL_WITHDRAWAL_SUBJECT_MESSAGE, walletToWithdraw.getName()),
+                    String.format(SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_HTMLCONTENT_MESSAGE,
+                            userAuthenticated.getFirstName(),
+                            "withdrawal",
+                            dto.getFunds(),
+                            walletToWithdraw.getCurrency().getCurrencyCode(),
+                            "from",
+                            walletToWithdraw.getName()),
+                    String.format(SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_TEXTCONTENT_MESSAGE,
+                            userAuthenticated.getFirstName(),
+                            "withdrawal",
+                            dto.getFunds(),
+                            walletToWithdraw.getCurrency().getCurrencyCode(),
+                            "from",
+                            walletToWithdraw.getName())
+            );
+        }
     }
 
     @Override
