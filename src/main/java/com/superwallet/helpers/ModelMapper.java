@@ -28,10 +28,12 @@ public class ModelMapper {
         WalletDtoOutWhole dto = new WalletDtoOutWhole();
 
         dto.setUsername(wallet.getUser().getUsername());
-        dto.setName(wallet.getName());
+        dto.setWalletName(wallet.getName());
         dto.setBalance(wallet.getBalance());
         dto.setCurrency(wallet.getCurrency().getCurrencyCode());
         dto.setStatus(wallet.getStatus().getStatusName());
+        dto.setDepositNotifications(wallet.getDepositNotifications());
+        dto.setWithdrawalNotifications(wallet.getWithdrawalNotifications());
 
         return dto;
     }

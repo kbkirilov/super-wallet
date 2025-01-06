@@ -1,10 +1,7 @@
 package com.superwallet.models.dto;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-
-import java.math.BigDecimal;
 
 public class WalletDtoInUpdate {
 
@@ -16,6 +13,10 @@ public class WalletDtoInUpdate {
 
     @Min(value = 1, message = "Status ID must be greater than 0.")
     private String statusId;
+
+    private Integer depositNotifications;
+
+    private Integer withdrawalNotifications;
 
     public WalletDtoInUpdate() {
     }
@@ -42,5 +43,21 @@ public class WalletDtoInUpdate {
 
     public void setStatusId(String statusId) {
         this.statusId = statusId;
+    }
+
+    public Integer getDepositNotifications() {
+        return depositNotifications;
+    }
+
+    public void setDepositNotifications(Integer depositNotifications) {
+        this.depositNotifications = depositNotifications;
+    }
+
+    public Integer getWithdrawalNotifications() {
+        return withdrawalNotifications;
+    }
+
+    public void setWithdrawalNotifications(Integer withdrawalNotifications) {
+        this.withdrawalNotifications = withdrawalNotifications;
     }
 }

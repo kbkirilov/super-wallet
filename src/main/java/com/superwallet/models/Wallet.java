@@ -32,6 +32,12 @@ public class Wallet {
     @Column(name = "balance")
     private BigDecimal balance;
 
+    @Column(name = "deposit_notifications")
+    private Integer depositNotifications;
+
+    @Column(name = "withdrawal_notifications")
+    private Integer withdrawalNotifications;
+
     public Wallet() {
     }
 
@@ -81,6 +87,22 @@ public class Wallet {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public Integer getDepositNotifications() {
+        return depositNotifications;
+    }
+
+    public void setDepositNotifications(Integer depositNotifications) {
+        this.depositNotifications = depositNotifications;
+    }
+
+    public Integer getWithdrawalNotifications() {
+        return withdrawalNotifications;
+    }
+
+    public void setWithdrawalNotifications(Integer withdrawalNotifications) {
+        this.withdrawalNotifications = withdrawalNotifications;
     }
 
     @Override
