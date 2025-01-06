@@ -13,6 +13,7 @@ create table users
     password varchar(15) not null ,
     first_name varchar(20) not null ,
     last_name varchar(20) not null ,
+    email varchar(50) not null ,
     date_of_birth datetime not null ,
     address varchar(200) not null
 );
@@ -45,6 +46,8 @@ create table wallets
     status_id int default 1,
     balance decimal(15,2) not null default 0 ,
     created_at datetime default current_timestamp ,
+    deposit_notifications boolean default true ,
+    withdrawal_notifications boolean default true ,
 
     constraint fk_wallets_currency_id
         foreign key (currency_id) references currencies (currency_id) ,
