@@ -25,9 +25,17 @@ The user can `deposit()`/`withdraw()` money to/from their wallets. These are som
 - `depositToWallet()`
   - Takes money from the user's `PocketMoney` and transfers them to his wallet of choice.
   - If `depositNotifications` is set to 1 the user receives an email notification every time he deposits money from his pocket to his wallet.
+  - If the wallet status is `Frozen` no deposits can be made to the wallet.
+  - If the deposit transaction amount is less than `0.01` the deposit can't be made.
+  - If pocket money currency code is different from the receiving wallet currency code the system will fetch the latest exchange rate and convert the funds automatically.
+  - If there are no funds in pocket money the deposit can't be made.
 - `withdrawFromWallet()`
   - Take money from the user's wallet and transfers them to their `PocketMoney` of choice.
   - If `withdrawalNotifications` is set to 1 the user receives an email notification every time he withdraws money from his wallet to his pocket money.
+  - If the wallet status is `Frozen` no withdrawals can be made from the wallet.
+  - If the withdrawal transaction amount is less than `0.01` the withdrawal can't be made.
+  - If wallet currency code is different from the receiving pocket money currency code the system will fetch the latest exchange rate and convert the funds automatically.
+  - If there are no funds in wallet the withdrawal can't be made.
 
 
 The `PocketMoney` object represents money you have in your pocket. For instance User1 may have 100 BGN and 50 EUR for instance. 
@@ -45,10 +53,14 @@ This is the source the user use for making deposits to the wallet and the destin
 5. 🔐 Basic Authentication is implemented. In Http Headers set Key: `Authorization` and Value: `username password` - check `insert.sql` for valid username and password.
 6. ✉️ The email notification service is implemented using [MailJet](https://www.mailjet.com/). To set it up follow these steps:
    1. Register at https://www.mailjet.com/
-   2. After login check your personal API key and secret
+   2. After login create your personal API and secret keys
    3. Go to `/src/main/resources/application.properties` and set up your API key and secret. For the secret key you need to create 
    an Environmental variable for extra security measures.
    4. Swap your personal API key and secret in the `MailJetConfig.java` class
+7. 💲 The currency exchange service is implemented using [ExchangeRate-API](https://www.exchangerate-api.com/) To set it up follow these steps:
+   1. Register at https://www.exchangerate-api.com/.
+   2. After login create your personal API key.
+   3. Go to `/src/main/resources/application.properties` and set up your API key.
 
 ## 📊 Database relations
 You can find them in `super-wallet/db`.
@@ -62,12 +74,14 @@ You can find them in `super-wallet/db`.
 
 ## ➡️ How to test it
 
-The happy path: Kitodar Todorov has decided to save money for a trip to Kosovo. He has got a few bucks in his pocket, but he wants to transfer them to an online
-wallet. He has already registered in the super wallet system, so the next step will be to create a new wallet. He gives it a name: "Kosovo trip"
+The happy path: Kiril Kirilov has decided to save money for a trip to Japan. He has got a few bucks in his pocket, but he wants to transfer them to an online
+wallet. He has already registered in the super wallet system, so the next step will be to create a new wallet. He gives it a name: "Japan trip"
 and sets the currency to BGN. Later he remembers that this may not be the most appropriate currency, so he changes it to USD 
-and the wallet's name to "Summer 2025". Now he transfers a few dollar from his pocket to the wallet. Once that is done, he sets the wallet's status to frozen.
+and the wallet's name to "Japan 2025". He also wants to get notified everytime he makes a deposit and withdrawal so he sets this up too.
+Now he has some pocket money in BGN, but the super wallet system support automatic conversion between different currencies.
+So he wires 100BGN from his pocket money to his wallet. Once that is done, he checks to see if a notification email is sent. Then sets the wallet's status to frozen.
 for extra security. A few days later he decides to make another deposit, but fails to do so because he forgot to change the wallet's status. Once the status is changed back to 
-active, he can make the deposit. 
+active, he can make the deposit. Some time pass, and he decides to buy a paper map of Japan, so he withdraws 10USD from his wallet to his pocket money. 
 
 ### 🌐 Endpoint: `GET /api/wallets/1`
 Retrieves the wallet details for the wallet with ID `1`
@@ -86,21 +100,23 @@ Create a new wallet
 ### Sample Request Body:
 ```json
 {
-    "name": "New House",
-    "currencyCode": "EUR"
+    "name": "Japan",
+    "currencyCode": "BGN"
 }
 ```
 ---
-### 🌐 Endpoint: `PUT /api/wallets/1`
-Updates the details of wallet with ID `1`
+### 🌐 Endpoint: `PUT /api/wallets/6`
+Updates the details of wallet with ID `6`
 ### Required Headers:
 - **Authorization**: **Key**: *Authorization* **Value**: *username password*
 ### Sample Request Body:
 ```json
 {
-  "name": "Friday's cinema",
-  "currencyCode": "BGN",
-  "statusId": "1"
+  "name": "Japan 2025",
+  "currencyCode": "USD",
+  "statusId": "1",
+  "depositNotifications": 1,
+  "withdrawalNotifications": 1
 }
 ```
 ---
@@ -111,8 +127,8 @@ Make a deposit to a wallet with ID `1` if possible
 ### Sample Request Body:
 ```json
 {
-  "funds": 50.00,
-  "pocketMoneyId": 1
+  "funds": 100.00,
+  "pocketMoneyId": 4
 }
 ```
 ---
@@ -123,8 +139,8 @@ Make a withdrawal from a wallet with ID `1` if possible
 ### Sample Request Body:
 ```json
 {
-  "funds": 20.00,
-  "pocketMoneyId": 1
+  "funds": 10.00,
+  "pocketMoneyId": 4
 }
 ```
 ---
