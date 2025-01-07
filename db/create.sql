@@ -46,8 +46,8 @@ create table wallets
     status_id int default 1,
     balance decimal(15,2) not null default 0 ,
     created_at datetime default current_timestamp ,
-    deposit_notifications boolean default true ,
-    withdrawal_notifications boolean default true ,
+    deposit_notifications boolean not null default false ,
+    withdrawal_notifications boolean not null default false ,
 
     constraint fk_wallets_currency_id
         foreign key (currency_id) references currencies (currency_id) ,
