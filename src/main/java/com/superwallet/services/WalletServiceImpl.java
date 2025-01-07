@@ -7,10 +7,7 @@ import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.repositories.interfaces.WalletJpaRepository;
-import com.superwallet.services.interfaces.CurrencyService;
-import com.superwallet.services.interfaces.PocketMoneyService;
-import com.superwallet.services.interfaces.StatusService;
-import com.superwallet.services.interfaces.WalletService;
+import com.superwallet.services.interfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,18 +25,20 @@ public class WalletServiceImpl implements WalletService {
     private final StatusService statusService;
     private final PocketMoneyService pocketMoneyService;
     private final MailJetServiceImpl mailJetService;
+    private final CurrencyExchangeService currencyExchangeService;
 
     @Autowired
     public WalletServiceImpl(WalletJpaRepository walletJpaRepository,
                              CurrencyService currencyService,
                              StatusService statusService,
-                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService) {
+                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService, CurrencyExchangeService currencyExchangeService) {
 
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
         this.statusService = statusService;
         this.pocketMoneyService = pocketMoneyService;
         this.mailJetService = mailJetService;
+        this.currencyExchangeService = currencyExchangeService;
     }
 
     @Override
@@ -240,17 +239,12 @@ public class WalletServiceImpl implements WalletService {
     private PocketMoney fetchAndValidatePocketMoney(User userAuthenticated, WalletDtoInDepositWithdrawal dto, Wallet walletToDeposit) {
         PocketMoney pocketMoneyOfUser = pocketMoneyService.getPocketMoneyById(dto.getPocketMoneyId());
         validatePocketMoneyOwnership(userAuthenticated, dto.getPocketMoneyId());
-        validateCurrencyMatch(walletToDeposit, pocketMoneyOfUser);
 
         return pocketMoneyOfUser;
     }
 
     private void validatePocketMoneyOwnership(User userAuthenticated, int pocketMoneyId) {
         throwIfNotPocketMoneyOwner(userAuthenticated, pocketMoneyId);
-    }
-
-    private void validateCurrencyMatch(Wallet walletToDeposit, PocketMoney pocketMoneyOfUser) {
-        throwIfCurrenciesDoNotMatch(walletToDeposit, pocketMoneyOfUser);
     }
 
     private void validateWalletStatus(Wallet walletToDeposit) {
@@ -267,13 +261,21 @@ public class WalletServiceImpl implements WalletService {
     }
 
     private void processDeposit(PocketMoney pocketMoneyOfUser, Wallet walletToDeposit, WalletDtoInDepositWithdrawal dto) {
-        pocketMoneyService.withdrawFundsFromPocket(pocketMoneyOfUser, dto);
-        walletToDeposit.setBalance(walletToDeposit.getBalance().add(dto.getFunds()));
+        pocketMoneyService.takeFundsFromPocket(pocketMoneyOfUser, dto);
+
+        String fromCurrencyCode = pocketMoneyOfUser.getCurrency().getCurrencyCode();
+        String toCurrencyCode = walletToDeposit.getCurrency().getCurrencyCode();
+
+        BigDecimal convertedAmount = currencyExchangeService.convertFundsBetweenCurrencies(
+                fromCurrencyCode, toCurrencyCode, dto.getFunds());
+
+        walletToDeposit.setBalance(walletToDeposit.getBalance().add(convertedAmount));
         walletJpaRepository.save(walletToDeposit);
     }
 
     private void processWithdrawal(PocketMoney pocketMoneyOfUser, Wallet walletToWithdraw, WalletDtoInDepositWithdrawal dto) {
-        pocketMoneyService.depositFundsToPocket(pocketMoneyOfUser, dto);
+        pocketMoneyService.sendFundsToPocket(walletToWithdraw, pocketMoneyOfUser, dto);
+
         walletToWithdraw.setBalance(walletToWithdraw.getBalance().subtract(dto.getFunds()));
         walletJpaRepository.save(walletToWithdraw);
     }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Component
 public class ModelMapper {
@@ -29,7 +30,7 @@ public class ModelMapper {
 
         dto.setUsername(wallet.getUser().getUsername());
         dto.setWalletName(wallet.getName());
-        dto.setBalance(wallet.getBalance());
+        dto.setBalance(wallet.getBalance().setScale(2, RoundingMode.HALF_UP));
         dto.setCurrency(wallet.getCurrency().getCurrencyCode());
         dto.setStatus(wallet.getStatus().getStatusName());
         dto.setDepositNotifications(wallet.getDepositNotifications());
@@ -46,6 +47,8 @@ public class ModelMapper {
         wallet.setUser(userAuthenticated);
         wallet.setStatus(statusService.getStatusById(1));
         wallet.setBalance(BigDecimal.ZERO);
+        wallet.setDepositNotifications(0);
+        wallet.setWithdrawalNotifications(0);
 
         return wallet;
     }
