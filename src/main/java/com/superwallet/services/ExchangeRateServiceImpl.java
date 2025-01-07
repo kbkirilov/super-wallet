@@ -1,6 +1,6 @@
 package com.superwallet.services;
 
-import com.superwallet.services.interfaces.CurrencyExchangeService;
+import com.superwallet.services.interfaces.ExchangeService;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +15,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
+public class ExchangeRateServiceImpl implements ExchangeService {
 
     private final String baseUrl;
 
     @Autowired
-    public CurrencyExchangeServiceImpl(@Value("${exchangerate.api.key}") String apiUrl,
-                                       @Value("#{getBaseUrl}") String baseUrl) {
+    public ExchangeRateServiceImpl(@Value("${exchangerate.api.key}") String apiUrl,
+                                   @Value("#{getBaseUrl}") String baseUrl) {
         this.baseUrl = baseUrl;
     }
 

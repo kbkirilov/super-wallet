@@ -25,20 +25,20 @@ public class WalletServiceImpl implements WalletService {
     private final StatusService statusService;
     private final PocketMoneyService pocketMoneyService;
     private final MailJetServiceImpl mailJetService;
-    private final CurrencyExchangeService currencyExchangeService;
+    private final ExchangeService exchangeService;
 
     @Autowired
     public WalletServiceImpl(WalletJpaRepository walletJpaRepository,
                              CurrencyService currencyService,
                              StatusService statusService,
-                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService, CurrencyExchangeService currencyExchangeService) {
+                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService, ExchangeService exchangeService) {
 
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
         this.statusService = statusService;
         this.pocketMoneyService = pocketMoneyService;
         this.mailJetService = mailJetService;
-        this.currencyExchangeService = currencyExchangeService;
+        this.exchangeService = exchangeService;
     }
 
     @Override
@@ -266,7 +266,7 @@ public class WalletServiceImpl implements WalletService {
         String fromCurrencyCode = pocketMoneyOfUser.getCurrency().getCurrencyCode();
         String toCurrencyCode = walletToDeposit.getCurrency().getCurrencyCode();
 
-        BigDecimal convertedAmount = currencyExchangeService.convertFundsBetweenCurrencies(
+        BigDecimal convertedAmount = exchangeService.convertFundsBetweenCurrencies(
                 fromCurrencyCode, toCurrencyCode, dto.getFunds());
 
         walletToDeposit.setBalance(walletToDeposit.getBalance().add(convertedAmount));

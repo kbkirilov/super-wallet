@@ -6,7 +6,7 @@ import com.superwallet.models.PocketMoney;
 import com.superwallet.models.Wallet;
 import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.repositories.interfaces.PocketMoneyJpaRepository;
-import com.superwallet.services.interfaces.CurrencyExchangeService;
+import com.superwallet.services.interfaces.ExchangeService;
 import com.superwallet.services.interfaces.PocketMoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,12 @@ import static com.superwallet.helpers.Constants.YOU_DON_T_HAVE_ENOUGH_FUNDS_ERRO
 public class PocketMoneyServiceImpl implements PocketMoneyService {
 
     private final PocketMoneyJpaRepository pocketMoneyJpaRepository;
-    private final CurrencyExchangeService currencyExchangeService;
+    private final ExchangeService exchangeService;
 
     @Autowired
-    public PocketMoneyServiceImpl(PocketMoneyJpaRepository pocketMoneyJpaRepository, CurrencyExchangeService currencyExchangeService) {
+    public PocketMoneyServiceImpl(PocketMoneyJpaRepository pocketMoneyJpaRepository, ExchangeService exchangeService) {
         this.pocketMoneyJpaRepository = pocketMoneyJpaRepository;
-        this.currencyExchangeService = currencyExchangeService;
+        this.exchangeService = exchangeService;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class PocketMoneyServiceImpl implements PocketMoneyService {
         String fromCurrencyCode = walletToWithdraw.getCurrency().getCurrencyCode();
         String toCurrencyCode = pocketMoney.getCurrency().getCurrencyCode();
 
-        BigDecimal convertedAmount = currencyExchangeService.convertFundsBetweenCurrencies(
+        BigDecimal convertedAmount = exchangeService.convertFundsBetweenCurrencies(
                 fromCurrencyCode, toCurrencyCode, dto.getFunds());
 
         pocketMoney.setAmount(pocketMoney.getAmount().add(convertedAmount));
