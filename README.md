@@ -29,6 +29,7 @@ The user can `deposit()`/`withdraw()` money to/from their wallets. These are som
   - If the deposit transaction amount is less than `0.01` the deposit can't be made.
   - If pocket money currency code is different from the receiving wallet currency code the system will fetch the latest exchange rate and convert the funds automatically.
   - If there are no funds in pocket money the deposit can't be made.
+  - Once the deposit is processed a deposit `TransactionLog` is recorded. 
 - `withdrawFromWallet()`
   - Take money from the user's wallet and transfers them to their `PocketMoney` of choice.
   - If `withdrawalNotifications` is set to 1 the user receives an email notification every time he withdraws money from his wallet to his pocket money.
@@ -36,6 +37,9 @@ The user can `deposit()`/`withdraw()` money to/from their wallets. These are som
   - If the withdrawal transaction amount is less than `0.01` the withdrawal can't be made.
   - If wallet currency code is different from the receiving pocket money currency code the system will fetch the latest exchange rate and convert the funds automatically.
   - If there are no funds in wallet the withdrawal can't be made.
+  - Once the withdrawal is processed a withdrawal `TransactionLog` is recorded.
+- `getWalletTransactionLogHistory()`
+  - It gets a list of all transaction logs for the wallet.
 
 
 The `PocketMoney` object represents money you have in your pocket. For instance User1 may have 100 BGN and 50 EUR for instance. 
@@ -79,9 +83,10 @@ wallet. He has already registered in the super wallet system, so the next step w
 and sets the currency to BGN. Later he remembers that this may not be the most appropriate currency, so he changes it to USD 
 and the wallet's name to "Japan 2025". He also wants to get notified everytime he makes a deposit and withdrawal so he sets this up too.
 Now he has some pocket money in BGN, but the super wallet system support automatic conversion between different currencies.
-So he wires 100BGN from his pocket money to his wallet. Once that is done, he checks to see if a notification email is sent. Then sets the wallet's status to frozen.
+So he wires 100BGN from his pocket money to his wallet and gives the deposit a name "First deposit for my Japan trip". Once that is done, he checks to see if a notification email is sent. Then sets the wallet's status to frozen.
 for extra security. A few days later he decides to make another deposit, but fails to do so because he forgot to change the wallet's status. Once the status is changed back to 
-active, he can make the deposit. Some time pass, and he decides to buy a paper map of Japan, so he withdraws 10USD from his wallet to his pocket money. 
+"Active", he can make the deposit. Some time pass, and he decides to buy a paper map of Japan, so he withdraws 10USD from his wallet to his pocket money and give the withdrawal a name "Paper map Japan".
+After that he checks the transaction log history for his wallet, which includes all deposit and withdrawals from that particular wallet.
 
 ### 🌐 Endpoint: `GET /api/wallets/1`
 Retrieves the wallet details for the wallet with ID `1`
@@ -90,6 +95,11 @@ Retrieves the wallet details for the wallet with ID `1`
 ---
 ### 🌐 Endpoint: `GET /api/wallets/1/balance`
 Retrieves the balance of the wallet with ID `1`
+### Required Headers:
+- **Authorization**: **Key**: *Authorization* **Value**: *username password*
+---
+### 🌐 Endpoint: `GET /api/wallets/6/transaction-history`
+Get the transaction history logs of wallet with ID `6`
 ### Required Headers:
 - **Authorization**: **Key**: *Authorization* **Value**: *username password*
 ---
@@ -128,7 +138,8 @@ Make a deposit to a wallet with ID `1` if possible
 ```json
 {
   "funds": 100.00,
-  "pocketMoneyId": 4
+  "pocketMoneyId": 4,
+  "paymentDetails": "Sample payment details"
 }
 ```
 ---
@@ -140,17 +151,19 @@ Make a withdrawal from a wallet with ID `1` if possible
 ```json
 {
   "funds": 10.00,
-  "pocketMoneyId": 4
+  "pocketMoneyId": 4,
+  "paymentDetails": "Sample payment details"
 }
 ```
 ---
 ## 💳 Wallet `/api/wallets`
 
 ### GET
-| Resource         | Endpoint                               | Description                                                      |
-|------------------|----------------------------------------|------------------------------------------------------------------|
-| Wallet           | `/{id}`                                | Get wallet by id                                                 |
-| Wallet           | `/{id}/balance`                        | Get wallet balance by id                                         |
+| Resource       | Endpoint                   | Description                       |
+|----------------|----------------------------|-----------------------------------|
+| Wallet         | `/{id}`                    | Get wallet by id                  |
+| Wallet         | `/{id}/balance`            | Get wallet balance by id          |
+| TransactionLog | `{id}/transaction-history` | Get transaction logs by wallet id |
 
 
 

@@ -58,3 +58,19 @@ create table wallets
     constraint unique_user_wallet_name
         unique (user_id, name)
 );
+
+create table transaction_logs
+(
+    transaction_id int auto_increment primary key ,
+    created_at datetime not null default now(),
+    sender varchar(50) not null ,
+    receiver varchar(50) not null ,
+    payment_details varchar(500) not null ,
+    amount varchar(50) not null ,
+    wallet_balance varchar(50) not null ,
+    type ENUM('DEPOSIT', 'WITHDRAWAL') not null ,
+    wallet_id int ,
+
+    constraint fk_transaction_logs_wallet_id
+        foreign key (wallet_id) references wallets (wallet_id)
+);

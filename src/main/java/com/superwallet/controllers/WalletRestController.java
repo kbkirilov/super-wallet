@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/wallets")
 public class WalletRestController {
@@ -143,6 +145,20 @@ public class WalletRestController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (InsufficientFundsException | EntityUpdateNotAllowedException | InvalidTransactionSumException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @GetMapping("{id}/transaction-history")
+    public List<TransactionLogDtoOut> getWalletTransactionLogHistory(@PathVariable int id, @RequestHeader HttpHeaders headers) {
+        try {
+            User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
+            Wallet wallet = walletService.getWalletById(userAuthenticated, id);
+
+            return modelMapper.fromSetTransactionLogToSetTransactionLogDtoOut(wallet.getTransactionLogs());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (AuthorizationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 }

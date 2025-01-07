@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "wallets")
@@ -37,6 +38,9 @@ public class Wallet {
 
     @Column(name = "withdrawal_notifications")
     private Integer withdrawalNotifications;
+
+    @OneToMany(mappedBy = "wallet")
+    private Set<TransactionLog> transactionLogs;
 
     public Wallet() {
     }
@@ -103,6 +107,14 @@ public class Wallet {
 
     public void setWithdrawalNotifications(Integer withdrawalNotifications) {
         this.withdrawalNotifications = withdrawalNotifications;
+    }
+
+    public Set<TransactionLog> getTransactionLogs() {
+        return transactionLogs;
+    }
+
+    public void setTransactionLogs(Set<TransactionLog> transactionLogHistory) {
+        this.transactionLogs = transactionLogHistory;
     }
 
     @Override

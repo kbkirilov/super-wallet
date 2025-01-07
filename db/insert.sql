@@ -41,6 +41,6 @@ values
     (2, 'Savings', 3, 1),
     (3, 'Main', 2, 2),
     (4, 'Dream home', 4, 3),
-    (5, 'Main', 2, 5);
+    (5, 'Main', 1, 5);
 
 
