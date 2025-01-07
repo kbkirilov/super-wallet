@@ -14,17 +14,20 @@ The user can `deposit()`/`withdraw()` money to/from their wallets. These are som
   - Each wallet can be created with a given currency. At the moment the database support the currencies of the 6
     strongest economies.
 - `updateWallet()` 
-  - A user can only update his wallet's information.
-  - A user is able to change the `status` on their wallet to either *Active* of *Frozen*. A wallet with status set to *Frozen* can't
+  - The user can only update his own wallet's information.
+  - The user is able to change the `status` on their wallet to either *Active* of *Frozen*. A wallet with status set to *Frozen* can't
   make deposits and withdrawals.
+  - The user can update the `depositNotifications` and `withdrawalNotifications` fields if he wants to receive email notifications when making a deposits/withdrawals.
   - The `currencyCode` of the wallet can be change only if the wallet's balance is equal to 0.
 - `getWalletBalance()`
   - A user can only get the balance of their own wallets.
 - `getWalletById()` - Gets the whole information about the wallet.
 - `depositToWallet()`
   - Takes money from the user's `PocketMoney` and transfers them to his wallet of choice.
+  - If `depositNotifications` is set to 1 the user receives an email notification every time he deposits money from his pocket to his wallet.
 - `withdrawFromWallet()`
   - Take money from the user's wallet and transfers them to their `PocketMoney` of choice.
+  - If `withdrawalNotifications` is set to 1 the user receives an email notification every time he withdraws money from his wallet to his pocket money.
 
 
 The `PocketMoney` object represents money you have in your pocket. For instance User1 may have 100 BGN and 50 EUR for instance. 
@@ -38,11 +41,17 @@ This is the source the user use for making deposits to the wallet and the destin
       You can find it in `supper-wallet/build.gradle`;
 3. 🔍 Check `DbConfig.java` and set your `Datasource Driver`;
 4. ⚙️ Set connection with database and use `create.sql` and `insert.sql` to create the database and fill it with data.
-   You can find them in `JobMatch/db`.
+   You can find them in `superwallet/db`.
 5. 🔐 Basic Authentication is implemented. In Http Headers set Key: `Authorization` and Value: `username password` - check `insert.sql` for valid username and password.
+6. ✉️ The email notification service is implemented using [MailJet](https://www.mailjet.com/). To set it up follow these steps:
+   1. Register at https://www.mailjet.com/
+   2. After login check your personal API key and secret
+   3. Go to `/src/main/resources/application.properties` and set up your API key and secret. For the secret key you need to create 
+   an Environmental variable for extra security measures.
+   4. Swap your personal API key and secret in the `MailJetConfig.java` class
 
 ## 📊 Database relations
-You can find it in `super-wallet/db`.
+You can find them in `super-wallet/db`.
 
 ## 💻 Technologies
 * ☕️ Java
