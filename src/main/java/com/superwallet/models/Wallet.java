@@ -3,6 +3,8 @@ package com.superwallet.models;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,7 +42,7 @@ public class Wallet {
     private Integer withdrawalNotifications;
 
     @OneToMany(mappedBy = "wallet")
-    private Set<TransactionLog> transactionLogs;
+    private List<TransactionLog> transactionLogs;
 
     public Wallet() {
     }
@@ -109,11 +111,11 @@ public class Wallet {
         this.withdrawalNotifications = withdrawalNotifications;
     }
 
-    public Set<TransactionLog> getTransactionLogs() {
-        return transactionLogs;
+    public List<TransactionLog> getTransactionLogs() {
+        return new ArrayList<>(transactionLogs);
     }
 
-    public void setTransactionLogs(Set<TransactionLog> transactionLogHistory) {
+    public void setTransactionLogs(List<TransactionLog> transactionLogHistory) {
         this.transactionLogs = transactionLogHistory;
     }
 

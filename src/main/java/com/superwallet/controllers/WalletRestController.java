@@ -154,7 +154,7 @@ public class WalletRestController {
             User userAuthenticated = authenticationHelper.tryGeyAuthenticatedUser(headers);
             Wallet wallet = walletService.getWalletById(userAuthenticated, id);
 
-            return modelMapper.fromSetTransactionLogToSetTransactionLogDtoOut(wallet.getTransactionLogs());
+            return modelMapper.fromListTransactionLogToSetTransactionLogDtoOut(wallet.getTransactionLogs());
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (AuthorizationException e) {

@@ -114,15 +114,15 @@ public class ModelMapper {
         return dto;
     }
 
-    public List<TransactionLogDtoOut> fromSetTransactionLogToSetTransactionLogDtoOut(Set<TransactionLog> set) {
-        if (set == null) {
+    public List<TransactionLogDtoOut> fromListTransactionLogToSetTransactionLogDtoOut(List<TransactionLog> list) {
+        if (list == null) {
             return new ArrayList<>();
         }
 
         List<TransactionLogDtoOut> dtoOuts = new ArrayList<>();
 
-        for (TransactionLog transactionLog : set) {
-            TransactionLogDtoOut dto = fromTransactionLogToTransactionLogDtoOut(transactionLog);
+        for (int i = list.size() - 1; i >= 0; i--) {
+            TransactionLogDtoOut dto = fromTransactionLogToTransactionLogDtoOut(list.get(i));
             dtoOuts.add(dto);
         }
 
