@@ -9,8 +9,8 @@ values
 
 insert into users (user_id, username, password, first_name, last_name, email, date_of_birth, address)
 values
-    (1, 'kitodartodorov', 'password', 'Kitodar', 'Todorov',
-     'kitodartodorov@gmail.com', '1978-01-12 00:00:00', 'ul. Pirotska 45, ap. 12, Sofia 1303, Bulgaria'),
+    (1, 'petarpetrov', 'password', 'Petar', 'Petrov',
+     'petarpetrov@gmail.com', '1978-01-12 00:00:00', 'ul. Pirotska 45, ap. 12, Sofia 1303, Bulgaria'),
     (2, 'markrober', 'password', 'Mark', 'Rober',
      'markrober@gmail.com','2000-04-01 00:00:00', '1234 Elm Street, Apt 56B, Springfield, IL 62701, USA'),
     (3, 'jeremyclarkson', 'password', 'Jeremy', 'Clarkson',
