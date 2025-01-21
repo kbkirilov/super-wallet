@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MailJetConfig {
 
-    @Value("d8db532ed3ba3253b1f12a314c250ae2")
+    @Value("${MAILJET_API_KEY}")
     private String apiKey;
 
     @Value("${MAILJET_API_SECRET}")
