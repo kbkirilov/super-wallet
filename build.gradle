@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'checkstyle'
 }
 
 group = 'com'
@@ -18,11 +17,6 @@ repositories {
 	mavenCentral()
 }
 
-checkstyle {
-	toolVersion = '10.12.3'
-	configFile = rootProject.file('config/checkstyle/checkstyle.xml')
-}
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -30,21 +24,12 @@ dependencies {
 	implementation 'com.mailjet:mailjet-client:5.2.1'
 	implementation 'org.flywaydb:flyway-core:10.20.1'
 	implementation "org.flywaydb:flyway-mysql"
-	checkstyle "com.puppycrawl.tools:checkstyle:10.12.3"
-	implementation "com.google.guava:guava:${findProperty('guava.version') ?: '33.0.0-jre'}"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	runtimeOnly 'mysql:mysql-connector-java:8.0.32'
 
-}
-
-configurations.all {
-	resolutionStrategy {
-		force 'com.google.guava:guava:32.0.1-jre'
-		force 'com.google.collections:google-collections:1.0'
-	}
 }
 
 tasks.named('test') {
