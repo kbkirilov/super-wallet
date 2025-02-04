@@ -40,6 +40,13 @@ dependencies {
 
 }
 
+configurations.all {
+	resolutionStrategy {
+		force 'com.google.guava:guava:32.0.1-jre'
+		force 'com.google.collections:google-collections:1.0'
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
