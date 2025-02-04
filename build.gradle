@@ -31,7 +31,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core:10.20.1'
 	implementation "org.flywaydb:flyway-mysql"
 	checkstyle "com.puppycrawl.tools:checkstyle:10.12.3"
-	implementation "com.google.guava:guava:${guava.version}"
+	implementation "com.google.guava:guava:${findProperty('guava.version') ?: '33.0.0-jre'}"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
