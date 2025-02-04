@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17.0.14'
-          distribution: 'adoptopenjdk'
+          distribution: 'adopt openjdk'
 
       - name: Build with Gradle
         run: ./gradlew build
