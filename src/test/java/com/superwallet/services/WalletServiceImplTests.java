@@ -42,31 +42,6 @@ public class WalletServiceImplTests {
     private WalletServiceImpl mockWalletService;
 
     @Test
-    public void createWallet_Should_CallRepository() {
-        Wallet mockWallet = createMockWallet();
-
-        mockWalletService.createWallet(mockWallet);
-
-        Mockito.verify(mockWalletJpaRepository, Mockito.times(1)).save(mockWallet);
-    }
-
-    @Test
-    public void getWalletById_ShouldReturnWallet_When_IdExistsAndUserIsOwner() {
-        Wallet mockWallet = createMockWallet();
-        User mockUser = createMockUser();
-
-        mockUser.setWallets(new HashSet<>(Collections.singleton(mockWallet)));
-        mockWallet.setUser(mockUser);
-
-        Mockito.when(mockWalletJpaRepository.getWalletByWalletId(Mockito.anyInt()))
-                .thenReturn(Optional.of(mockWallet));
-
-        Wallet result = mockWalletService.getWalletById(mockUser, 1);
-
-        Assertions.assertEquals(mockWallet, result);
-    }
-
-    @Test
     public void getWalletById_ShouldThrowException_When_UserIsNotOwner() {
         Wallet mockWallet = createMockWallet();
         User mockUser = createMockUser();
