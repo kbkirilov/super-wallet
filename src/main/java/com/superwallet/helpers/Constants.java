@@ -15,6 +15,10 @@ public class Constants {
 
     public static final String SUCCESSFUL_DEPOSIT_SUBJECT_MESSAGE = "Successful deposit to your %s wallet!";
     public static final String SUCCESSFUL_WITHDRAWAL_SUBJECT_MESSAGE = "Successful withdrawal from your %s wallet!";
+
+    public static final String TRANSACTION_TYPE_DEPOSIT = "DEPOSIT";
+    public static final String TRANSACTION_TYPE_WITHDRAWAL = "WITHDRAWAL";
+
     public static final String SUCCESSFUL_DEPOSIT_AND_WITHDRAWAL_HTMLCONTENT_MESSAGE = """
                 <html>
                 <body>

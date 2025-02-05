@@ -55,13 +55,14 @@ This is the source of the user for processing deposits to the wallet and the des
 4. ⚙️ Set connection with the database and use `create.sql` and `insert.sql` to create the database and fill it with data.
    You can find them in `superwallet/db`.
 5. 🔐 Basic Authentication is implemented. In HTTP Headers set Key: `Authorization` and Value: `username password`. Check `insert.sql` for a valid username and password.
-6. ✉️ The email notification service is implemented using [MailJet](https://www.mailjet.com/). To set it up follow these steps:
+6. Be sure to run Apache Kafka client locally. The project runs with the latest version of Apache Kafka 3.9.0.
+7. ✉️ The email notification service is implemented using [MailJet](https://www.mailjet.com/). To set it up follow these steps:
    1. Register at https://www.mailjet.com/
    2. After login create your API and secret keys
    3. Go to `/src/main/resources/application.properties` and set up your API key and secret. For the secret key you need to create 
    an Environmental variable for extra security measures.
    4. Swap your personal API key and secret in the `MailJetConfig.java` class
-7. 💲 The currency exchange service is implemented using [ExchangeRate-API](https://www.exchangerate-api.com/) To set it up follow these steps:
+8. 💲 The currency exchange service is implemented using [ExchangeRate-API](https://www.exchangerate-api.com/) To set it up follow these steps:
    1. Register at https://www.exchangerate-api.com/.
    2. After login create your personal API key.
    3. Go to `/src/main/resources/application.properties` and set up your API key.
@@ -75,6 +76,7 @@ You can find them in `super-wallet/db`.
 * 💾 MariaDB
 * 🌐 REST API
 * 📦 Gradle
+* 🔄 Apache Kafka
 
 ## ➡️ How to test it
 

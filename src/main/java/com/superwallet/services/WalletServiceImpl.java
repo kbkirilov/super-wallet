@@ -8,6 +8,7 @@ import com.superwallet.models.dto.WalletDtoInDepositWithdrawal;
 import com.superwallet.models.dto.WalletDtoInUpdate;
 import com.superwallet.repositories.interfaces.WalletJpaRepository;
 import com.superwallet.services.interfaces.*;
+import com.superwallet.services.kafka.TransactionActivityProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +28,13 @@ public class WalletServiceImpl implements WalletService {
     private final MailJetServiceImpl mailJetService;
     private final ExchangeService exchangeService;
     private final TransactionLogService recordWithdrawalTransactionLog;
+    private final TransactionActivityProducer transactionActivityProducer;
 
     @Autowired
     public WalletServiceImpl(WalletJpaRepository walletJpaRepository,
                              CurrencyService currencyService,
                              StatusService statusService,
-                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService, ExchangeService exchangeService, TransactionLogService transactionLogService) {
+                             PocketMoneyService pocketMoneyService, MailJetServiceImpl mailJetService, ExchangeService exchangeService, TransactionLogService transactionLogService, TransactionActivityProducer transactionActivityProducer) {
 
         this.walletJpaRepository = walletJpaRepository;
         this.currencyService = currencyService;
@@ -41,6 +43,7 @@ public class WalletServiceImpl implements WalletService {
         this.mailJetService = mailJetService;
         this.exchangeService = exchangeService;
         this.recordWithdrawalTransactionLog = transactionLogService;
+        this.transactionActivityProducer = transactionActivityProducer;
     }
 
     @Override
@@ -84,7 +87,8 @@ public class WalletServiceImpl implements WalletService {
         processDeposit(pocketMoneyOfUser, walletToDeposit, dto);
 
         recordDepositTransactionLog(walletToDeposit, dto);
-        sendDepositNotificationEmail(userAuthenticated, walletToDeposit, dto);
+
+        transactionActivityProducer.sendTransactionActivity(userAuthenticated, walletToDeposit, dto, TRANSACTION_TYPE_DEPOSIT);
 
         return walletToDeposit;
     }
@@ -100,7 +104,8 @@ public class WalletServiceImpl implements WalletService {
         processWithdrawal(pocketMoneyOfUser, walletToWithdraw, dto);
 
         recordWithdrawalTransactionLog(walletToWithdraw, dto);
-        sendWithdrawalNotificationEmail(userAuthenticated, walletToWithdraw, dto);
+
+        transactionActivityProducer.sendTransactionActivity(userAuthenticated, walletToWithdraw, dto, TRANSACTION_TYPE_WITHDRAWAL);
 
         return walletToWithdraw;
     }
